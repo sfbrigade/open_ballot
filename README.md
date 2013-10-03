@@ -17,3 +17,8 @@ Once you have postgresql 9.2 installed (good luck), run the following:
 
 ./manage.py syncdb
 ./manage.py migrate open_ballot
+
+To generate schemas:
+	install graphviz, libgraphviz-dev (apt-get for ubuntu, mac users, sorry)
+	pip install pygraphviz
+	./manage.py graph_models open_ballot -o schema.png
