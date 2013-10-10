@@ -136,6 +136,19 @@ class Employer(BaseModel):
 
     name = models.CharField(max_length=300)
 
+    @classmethod
+    def get_or_create(cls, name):
+        try:
+            employer = Employer.objects.get(name=name)
+        except Employer.DoesNotExist:
+            employer = Employer(name=name)
+            employer.save()
+
+        return employer
+
+    def __repr__(self):
+        return '< Employer | Name: %s >' % self.name
+
 class Donation(BaseModel):
     class Meta:
         app_label = 'open_ballot'

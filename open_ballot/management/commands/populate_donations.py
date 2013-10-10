@@ -3,7 +3,7 @@ import csv, re, os
 from configparser import ConfigParser
 from dateutil import parser
 
-from open_ballot.models import Donor, Committee, Donation
+from open_ballot.models import Donor, Committee, Donation, Employer
 
 class Command(BaseCommand):
     args = '< filename >'
@@ -41,6 +41,8 @@ class Command(BaseCommand):
             'first_name': configparser.get('headers', 'first_name'),
             'last_name': configparser.get('headers', 'last_name'),
             'transaction_date': configparser.get('headers', 'transaction_date'),
+            'employer': configparser.get('headers', 'employer'),
+            'filer_id': configparser.get('headers', 'filer_id'),
             'location': configparser.get('headers', 'location')
         }
 
@@ -58,14 +60,23 @@ class Command(BaseCommand):
             first_name = row[headers['first_name']]
             last_name = row[headers['last_name']]
 
+
             donor = Donor.get_or_create(first_name=first_name, last_name=last_name,
                 latitude=latitude, longitude=longitude)
 
+            employer_name = row[headers['employer']]
+
+            if employer_name and not donor.employer:
+                employer = Employer.get_or_create(name=employer_name)
+                donor.employer = employer
+                donor.save()
+
             committee_name = row[headers['committee_name']]
             transaction_date = parser.parse(row[headers['transaction_date']]) 
-            year = transaction_date.year
 
-            committee = Committee.get_or_create(name=committee_name, year=year)
+            filer_id = row[headers['filer_id']]
+            committee = Committee.get_or_create(name=committee_name,
+                filer_id=filer_id)
 
             #TODO: Figure out how to spot duplicate donations...
             Donation(
