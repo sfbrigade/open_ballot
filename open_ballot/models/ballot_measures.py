@@ -32,29 +32,31 @@ class Tag(BaseModel):
 class Committee(BaseModel):
     class Meta:
         app_label = 'open_ballot'
-        unique_together = ('name', 'year')
+        unique_together = ('name', 'filer_id')
 
     name = models.CharField(max_length=300)
-    year = models.IntegerField()
-    money_raised = models.FloatField(null=True)
-
-    stance = models.ForeignKey('Stance', null=True)
+    filer_id = models.CharField(max_length=10)
 
     @classmethod
-    def get_or_create(cls, name, year):
+    def get_or_create(cls, name, filer_id):
         try:
-            return Committee.objects.get(name=name, year=year)
+            return Committee.objects.get(name=name, filer_id=filer_id)
         except Committee.DoesNotExist:
-            new_committee = Committee(name=name, year=year)
+            new_committee = Committee(name=name, filer_id=filer_id)
             new_committee.save()
             return new_committee
+
+    def __repr__(self):
+        return '< Committee | Name: %s >' % self.name
 
 class Stance(BaseModel):
     class Meta:
         app_label = 'open_ballot'
+        unique_together = ('committee', 'ballot_measure')
 
     voted_yes = models.BooleanField()
 
+    committee = models.ForeignKey('Committee')
     ballot_measure = models.ForeignKey('BallotMeasure')
 
 class Consultant(BaseModel):
@@ -93,6 +95,8 @@ class Donor(BaseModel):
     latitude = models.FloatField()
     longitude = models.FloatField()
 
+    employer = models.ForeignKey('Employer', null=True)
+
     @classmethod
     def get_or_create(cls, first_name, last_name, latitude, longitude, address=''):
         try:
@@ -110,6 +114,28 @@ class Donor(BaseModel):
             new_donor.save()
             return new_donor
 
+    def __repr__(self):
+        reprstring = '< Donor '
+        #this should never happen
+        if not self.first_name and not self.last_name:
+            return reprstring + '>'
+
+        if self.first_name:
+            reprstring += '| First Name: ' + self.first_name
+
+        if self.last_name:
+            reprstring += '| Last Name: ' + self.last_name
+
+        reprstring += ' >'
+
+        return reprstring
+
+class Employer(BaseModel):
+    class Meta:
+        app_label = 'open_ballot'
+
+    name = models.CharField(max_length=300)
+
 class Donation(BaseModel):
     class Meta:
         app_label = 'open_ballot'
@@ -119,3 +145,14 @@ class Donation(BaseModel):
 
     donor = models.ForeignKey('Donor')
     committee = models.ForeignKey('Committee')
+
+    def __repr__(self):
+        reprstring = '< Donation | Amount: %s | Date: %s' \
+            % (str(self.amount), str(self.transaction_date))
+
+        reprstring += '| Donor: %s %s' % (self.donor.first_name,
+            self.donor.last_name)
+
+        reprstring += '| Committee: %s >' % self.committee.name
+
+        return reprstring
