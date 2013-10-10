@@ -15,6 +15,8 @@ Postgres settings, for now, should be username/password as postgres/postgres (at
 
 Once you have postgresql 9.2 installed (good luck), run the following:
 
+On a Mac, the easiest way to install Postgres is using Postgres.app from http://postgresapp.com/.
+
 ./manage.py syncdb
 ./manage.py migrate open_ballot
 
