@@ -58,14 +58,12 @@ class Migration(SchemaMigration):
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=300)),
-            ('year', self.gf('django.db.models.fields.IntegerField')()),
-            ('money_raised', self.gf('django.db.models.fields.FloatField')(null=True)),
-            ('stance', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.Stance'], null=True)),
+            ('filer_id', self.gf('django.db.models.fields.CharField')(max_length=10)),
         ))
         db.send_create_signal('open_ballot', ['Committee'])
 
-        # Adding unique constraint on 'Committee', fields ['name', 'year']
-        db.create_unique(u'open_ballot_committee', ['name', 'year'])
+        # Adding unique constraint on 'Committee', fields ['name', 'filer_id']
+        db.create_unique(u'open_ballot_committee', ['name', 'filer_id'])
 
         # Adding model 'Stance'
         db.create_table(u'open_ballot_stance', (
@@ -73,9 +71,13 @@ class Migration(SchemaMigration):
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('voted_yes', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('committee', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.Committee'])),
             ('ballot_measure', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.BallotMeasure'])),
         ))
         db.send_create_signal('open_ballot', ['Stance'])
+
+        # Adding unique constraint on 'Stance', fields ['committee', 'ballot_measure']
+        db.create_unique(u'open_ballot_stance', ['committee_id', 'ballot_measure_id'])
 
         # Adding model 'Consultant'
         db.create_table(u'open_ballot_consultant', (
@@ -120,11 +122,21 @@ class Migration(SchemaMigration):
             ('address', self.gf('django.db.models.fields.CharField')(max_length=300)),
             ('latitude', self.gf('django.db.models.fields.FloatField')()),
             ('longitude', self.gf('django.db.models.fields.FloatField')()),
+            ('employer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.Employer'], null=True)),
         ))
         db.send_create_signal('open_ballot', ['Donor'])
 
         # Adding unique constraint on 'Donor', fields ['first_name', 'last_name', 'latitude', 'longitude']
         db.create_unique(u'open_ballot_donor', ['first_name', 'last_name', 'latitude', 'longitude'])
+
+        # Adding model 'Employer'
+        db.create_table(u'open_ballot_employer', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=300)),
+        ))
+        db.send_create_signal('open_ballot', ['Employer'])
 
         # Adding model 'Donation'
         db.create_table(u'open_ballot_donation', (
@@ -143,8 +155,11 @@ class Migration(SchemaMigration):
         # Removing unique constraint on 'Donor', fields ['first_name', 'last_name', 'latitude', 'longitude']
         db.delete_unique(u'open_ballot_donor', ['first_name', 'last_name', 'latitude', 'longitude'])
 
-        # Removing unique constraint on 'Committee', fields ['name', 'year']
-        db.delete_unique(u'open_ballot_committee', ['name', 'year'])
+        # Removing unique constraint on 'Stance', fields ['committee', 'ballot_measure']
+        db.delete_unique(u'open_ballot_stance', ['committee_id', 'ballot_measure_id'])
+
+        # Removing unique constraint on 'Committee', fields ['name', 'filer_id']
+        db.delete_unique(u'open_ballot_committee', ['name', 'filer_id'])
 
         # Deleting model 'BallotMeasure'
         db.delete_table(u'open_ballot_ballotmeasure')
@@ -176,6 +191,9 @@ class Migration(SchemaMigration):
         # Deleting model 'Donor'
         db.delete_table(u'open_ballot_donor')
 
+        # Deleting model 'Employer'
+        db.delete_table(u'open_ballot_employer')
+
         # Deleting model 'Donation'
         db.delete_table(u'open_ballot_donation')
 
@@ -205,14 +223,12 @@ class Migration(SchemaMigration):
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.committee': {
-            'Meta': {'unique_together': "(('name', 'year'),)", 'object_name': 'Committee'},
+            'Meta': {'unique_together': "(('name', 'filer_id'),)", 'object_name': 'Committee'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'filer_id': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'money_raised': ('django.db.models.fields.FloatField', [], {'null': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
-            'stance': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.Stance']", 'null': 'True'}),
-            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'year': ('django.db.models.fields.IntegerField', [], {})
+            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.consultant': {
             'Meta': {'object_name': 'Consultant'},
@@ -247,11 +263,19 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('first_name', 'last_name', 'latitude', 'longitude'),)", 'object_name': 'Donor'},
             'address': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'employer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.Employer']", 'null': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'latitude': ('django.db.models.fields.FloatField', [], {}),
             'longitude': ('django.db.models.fields.FloatField', [], {}),
+            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        'open_ballot.employer': {
+            'Meta': {'object_name': 'Employer'},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.service': {
@@ -263,8 +287,9 @@ class Migration(SchemaMigration):
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.stance': {
-            'Meta': {'object_name': 'Stance'},
+            'Meta': {'unique_together': "(('committee', 'ballot_measure'),)", 'object_name': 'Stance'},
             'ballot_measure': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.BallotMeasure']"}),
+            'committee': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.Committee']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
