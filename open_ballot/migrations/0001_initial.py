@@ -13,14 +13,14 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=300)),
-            ('prop_id', self.gf('django.db.models.fields.CharField')(max_length=300)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('election_date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('num_yes', self.gf('django.db.models.fields.IntegerField')()),
-            ('num_no', self.gf('django.db.models.fields.IntegerField')()),
-            ('passed', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('ballot_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.BallotType'])),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=300, null=True)),
+            ('prop_id', self.gf('django.db.models.fields.CharField')(max_length=3)),
+            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
+            ('election_date', self.gf('django.db.models.fields.DateField')()),
+            ('num_yes', self.gf('django.db.models.fields.IntegerField')(null=True)),
+            ('num_no', self.gf('django.db.models.fields.IntegerField')(null=True)),
+            ('passed', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
+            ('ballot_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.BallotType'], null=True)),
         ))
         db.send_create_signal('open_ballot', ['BallotMeasure'])
 
@@ -58,7 +58,7 @@ class Migration(SchemaMigration):
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=300)),
-            ('filer_id', self.gf('django.db.models.fields.CharField')(max_length=10)),
+            ('filer_id', self.gf('django.db.models.fields.CharField')(max_length=10, blank=True)),
         ))
         db.send_create_signal('open_ballot', ['Committee'])
 
@@ -84,7 +84,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=300)),
+            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=300, blank=True)),
             ('last_name', self.gf('django.db.models.fields.CharField')(max_length=300)),
             ('address', self.gf('django.db.models.fields.CharField')(max_length=300, blank=True)),
         ))
@@ -107,8 +107,8 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=300)),
-            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=300, blank=True)),
+            ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
         ))
         db.send_create_signal('open_ballot', ['Service'])
 
@@ -201,16 +201,16 @@ class Migration(SchemaMigration):
     models = {
         'open_ballot.ballotmeasure': {
             'Meta': {'object_name': 'BallotMeasure'},
-            'ballot_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.BallotType']"}),
+            'ballot_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.BallotType']", 'null': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'election_date': ('django.db.models.fields.DateTimeField', [], {}),
+            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
+            'election_date': ('django.db.models.fields.DateField', [], {}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
-            'num_no': ('django.db.models.fields.IntegerField', [], {}),
-            'num_yes': ('django.db.models.fields.IntegerField', [], {}),
-            'passed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'prop_id': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '300', 'null': 'True'}),
+            'num_no': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'num_yes': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'passed': ('django.db.models.fields.NullBooleanField', [], {'null': 'True', 'blank': 'True'}),
+            'prop_id': ('django.db.models.fields.CharField', [], {'max_length': '3'}),
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['open_ballot.Tag']", 'symmetrical': 'False'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
@@ -225,7 +225,7 @@ class Migration(SchemaMigration):
         'open_ballot.committee': {
             'Meta': {'unique_together': "(('name', 'filer_id'),)", 'object_name': 'Committee'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'filer_id': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
+            'filer_id': ('django.db.models.fields.CharField', [], {'max_length': '10', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
@@ -234,7 +234,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Consultant'},
             'address': ('django.db.models.fields.CharField', [], {'max_length': '300', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
+            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '300', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
@@ -281,9 +281,9 @@ class Migration(SchemaMigration):
         'open_ballot.service': {
             'Meta': {'object_name': 'Service'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
+            'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '300', 'blank': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.stance': {

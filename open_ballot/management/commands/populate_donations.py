@@ -36,14 +36,14 @@ class Command(BaseCommand):
         configparser.read_file(open(settings_file))
 
         headers = {
-            'amount': configparser.get('headers', 'amount'),
-            'committee_name': configparser.get('headers', 'committee_name'),
-            'first_name': configparser.get('headers', 'first_name'),
-            'last_name': configparser.get('headers', 'last_name'),
-            'transaction_date': configparser.get('headers', 'transaction_date'),
-            'employer': configparser.get('headers', 'employer'),
-            'filer_id': configparser.get('headers', 'filer_id'),
-            'location': configparser.get('headers', 'location')
+            'amount': configparser.get('donations', 'amount'),
+            'committee_name': configparser.get('donations', 'committee_name'),
+            'first_name': configparser.get('donations', 'first_name'),
+            'last_name': configparser.get('donations', 'last_name'),
+            'transaction_date': configparser.get('donations', 'transaction_date'),
+            'employer': configparser.get('donations', 'employer'),
+            'filer_id': configparser.get('donations', 'filer_id'),
+            'location': configparser.get('donations', 'location')
         }
 
         reader = csv.DictReader(open(csv_file_path))
@@ -75,8 +75,10 @@ class Command(BaseCommand):
             transaction_date = parser.parse(row[headers['transaction_date']]) 
 
             filer_id = row[headers['filer_id']]
-            committee = Committee.get_or_create(name=committee_name,
-                filer_id=filer_id)
+            committee = Committee.get_or_create(name=committee_name)
+
+            committee.filer_id = filer_id
+            committee.save()
 
             #TODO: Figure out how to spot duplicate donations...
             Donation(

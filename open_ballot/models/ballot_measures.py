@@ -5,16 +5,26 @@ class BallotMeasure(BaseModel):
     class Meta:
         app_label = 'open_ballot'
 
-    name = models.CharField(max_length=300)
-    prop_id = models.CharField(max_length=300)
-    description = models.TextField()
-    election_date = models.DateTimeField()
-    num_yes = models.IntegerField()
-    num_no = models.IntegerField()
-    passed = models.BooleanField()
+    name = models.CharField(max_length=300, null=True)
+    prop_id = models.CharField(max_length=3)
+    description = models.TextField(blank=True)
+    election_date = models.DateField()
+    num_yes = models.IntegerField(null=True)
+    num_no = models.IntegerField(null=True)
+    passed = models.NullBooleanField(null=True)
 
-    ballot_type = models.ForeignKey('BallotType')
+    ballot_type = models.ForeignKey('BallotType', null=True)
     tags = models.ManyToManyField('Tag')
+
+    @classmethod
+    def get_or_create(cls, election_date, prop_id):
+        try:
+            return cls.objects.get(election_date=election_date,
+            prop_id=prop_id)
+        except BallotMeasure.DoesNotExist:
+            new_ballot = cls(election_date=election_date, prop_id=prop_id)
+            new_ballot.save()
+            return new_ballot
 
 class BallotType(BaseModel):
     class Meta:
@@ -35,14 +45,14 @@ class Committee(BaseModel):
         unique_together = ('name', 'filer_id')
 
     name = models.CharField(max_length=300)
-    filer_id = models.CharField(max_length=10)
+    filer_id = models.CharField(max_length=10, blank=True)
 
     @classmethod
-    def get_or_create(cls, name, filer_id):
+    def get_or_create(cls, name):
         try:
-            return Committee.objects.get(name=name, filer_id=filer_id)
+            return Committee.objects.get(name=name)
         except Committee.DoesNotExist:
-            new_committee = Committee(name=name, filer_id=filer_id)
+            new_committee = Committee(name=name)
             new_committee.save()
             return new_committee
 
@@ -59,13 +69,44 @@ class Stance(BaseModel):
     committee = models.ForeignKey('Committee')
     ballot_measure = models.ForeignKey('BallotMeasure')
 
+    @classmethod
+    def get(cls, committee, ballot_measure):
+        try:
+            return cls.objects.get(committee=committee,
+                ballot_measure=ballot_measure)
+        except Stance.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_or_create(cls, committee, ballot_measure, voted_yes):
+        existing = cls.get(committee, ballot_measure)
+        if existing:
+            return existing
+
+        new_stance = cls(committee=committee, ballot_measure=ballot_measure,
+            voted_yes=voted_yes)
+        new_stance.save()
+        return new_stance
+
 class Consultant(BaseModel):
     class Meta:
         app_label = 'open_ballot'
 
-    first_name = models.CharField(max_length=300)
+    #If consultant is organization, we just use last_name
+    first_name = models.CharField(max_length=300, blank=True)
     last_name = models.CharField(max_length=300)
     address = models.CharField(max_length=300, blank=True)
+
+    @classmethod
+    def get_or_create(cls, first_name, last_name, address=''):
+        try:
+            return cls.objects.get(first_name=first_name,
+                last_name=last_name, address=address)
+        except Consultant.DoesNotExist:
+            new_consultant = cls(first_name=first_name, last_name=last_name,
+                address=address)
+            new_consultant.save()
+            return new_consultant
 
 class Contract(BaseModel):
     class Meta:
@@ -77,12 +118,40 @@ class Contract(BaseModel):
     service = models.OneToOneField('Service')
     committee = models.ForeignKey('Committee')
 
+    @classmethod
+    def get(cls, consultant, committee, service_name='', service_description=''):
+        try:
+            return cls.objects.get(consultant=consultant,
+                service__name=service_name, committee=committee,
+                service__description=service_description)
+        except Contract.DoesNotExist:
+            return None
+
+    @classmethod
+    def get_or_create(cls, consultant, committee, payment,
+        service_name='', service_description=''):
+        existing = cls.get(consultant=consultant,
+                service_name=service_name, committee=committee)
+
+        if existing:
+            return existing
+
+        new_service = Service(name=service_name,
+            description=service_description)
+        new_service.save()
+        new_contract = cls(consultant=consultant, committee=committee,
+            payment=payment, service=new_service)
+
+        new_contract.save()
+
+        return new_contract
+
 class Service(BaseModel):
     class Meta:
         app_label = 'open_ballot'
 
-    name = models.CharField(max_length=300)
-    description = models.TextField()
+    name = models.CharField(max_length=300, blank=True)
+    description = models.TextField(blank=True)
 
 class Donor(BaseModel):
     class Meta:
