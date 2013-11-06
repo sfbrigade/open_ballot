@@ -1,5 +1,9 @@
 from base import BaseModel
-from django.db import models
+from django.db import models, connection
+from dateutil.parser import parse as date_parse
+import re, datetime
+
+MIN_YEAR = 1999
 
 class BallotMeasure(BaseModel):
     class Meta:
@@ -8,23 +12,56 @@ class BallotMeasure(BaseModel):
     name = models.CharField(max_length=300, null=True)
     prop_id = models.CharField(max_length=3)
     description = models.TextField(blank=True)
-    election_date = models.DateField()
     num_yes = models.IntegerField(null=True)
     num_no = models.IntegerField(null=True)
     passed = models.NullBooleanField(null=True)
 
     ballot_type = models.ForeignKey('BallotType', null=True)
+    election = models.ForeignKey('Election', null=True)
     tags = models.ManyToManyField('Tag')
 
     @classmethod
-    def get_or_create(cls, election_date, prop_id):
+    def get_or_create(cls, election, prop_id):
         try:
-            return cls.objects.get(election_date=election_date,
+            return cls.objects.get(election=election,
             prop_id=prop_id)
         except BallotMeasure.DoesNotExist:
-            new_ballot = cls(election_date=election_date, prop_id=prop_id)
+            new_ballot = cls(election=election, prop_id=prop_id)
             new_ballot.save()
             return new_ballot
+
+    def save(self):
+        if self.election:
+            super(BallotMeasure, self).save()
+
+class Election(BaseModel):
+    class Meta:
+        app_label = 'open_ballot'
+
+    date = models.DateField()
+    
+    @classmethod
+    def get_or_create(self, election_date_str):
+        if not election_date_str:
+            return None
+
+        election_date_time = date_parse(election_date_str)
+        election_date = datetime.date(year=election_date_time.year,
+            month=election_date_time.month,
+            day=election_date_time.day)
+        try:
+            return Election.objects.get(date=election_date)
+        except Election.DoesNotExist:
+            election = Election(date=election_date)
+            election.save()
+            return election
+
+    def is_valid(self):
+        return self.date.year >= MIN_YEAR
+
+    def save(self):
+        if self.is_valid():
+            super(Election, self).save()
 
 class BallotType(BaseModel):
     class Meta:
@@ -42,22 +79,60 @@ class Tag(BaseModel):
 class Committee(BaseModel):
     class Meta:
         app_label = 'open_ballot'
-        unique_together = ('name', 'filer_id')
 
     name = models.CharField(max_length=300)
     filer_id = models.CharField(max_length=10, blank=True)
+    sponsor = models.CharField(max_length=300)
+
+    election = models.ForeignKey('Election', null=True)
 
     @classmethod
-    def get_or_create(cls, name):
+    def format_name(cls, name):
+        stance_clause = re.compile(',\W+(yes|no)\W+on\W+prop\W[a-z]+$')
+
+    @classmethod
+    def get_or_create(cls, name, election=None):
+        name = name.title()
+
         try:
-            return Committee.objects.get(name=name)
-        except Committee.DoesNotExist:
-            new_committee = Committee(name=name)
-            new_committee.save()
-            return new_committee
+            cursor = connection.cursor()
+            params = [name]
+            querystring = "SELECT id FROM open_ballot_committee\n"
+
+            if election:
+                querystring += "WHERE election_id=%s\n"
+                params.insert(0, election.id)
+            querystring += "ORDER BY similarity(name, %s) DESC;"
+
+            cursor.execute(querystring, params)
+            most_similar_id = cursor.fetchone()[0]
+        except TypeError:
+            pass
+        else:
+            most_similar = cls.objects.get(id=most_similar_id)
+            #Run db-level query to find how strong of a match the input name
+            #is to the existing committee name.
+            cursor.execute(
+                'SELECT similarity(%s, %s);',
+                [name, most_similar.name])
+
+            fuzzy_match = cursor.fetchone()[0]
+            #Arbitrarily decided threshold of .6
+            #import ipdb;ipdb.set_trace()
+            if fuzzy_match >= .6:
+                return most_similar
+
+        #If no committees exist or if none with a similar name exist
+        new_committee = Committee(name=name, election=election)
+        new_committee.save()
+        return new_committee
 
     def __repr__(self):
-        return '< Committee | Name: %s >' % self.name
+        return unicode('< Committee | Name: %s >' % self.name).encode('utf-8')
+
+    def save(self):
+        self.name = self.name.title()
+        super(Committee, self).save()
 
 class Stance(BaseModel):
     class Meta:
@@ -92,21 +167,38 @@ class Consultant(BaseModel):
     class Meta:
         app_label = 'open_ballot'
 
-    #If consultant is organization, we just use last_name
-    first_name = models.CharField(max_length=300, blank=True)
-    last_name = models.CharField(max_length=300)
+    name = models.CharField(max_length=300)
     address = models.CharField(max_length=300, blank=True)
 
     @classmethod
-    def get_or_create(cls, first_name, last_name, address=''):
+    def get_or_create(cls, name):
         try:
-            return cls.objects.get(first_name=first_name,
-                last_name=last_name, address=address)
-        except Consultant.DoesNotExist:
-            new_consultant = cls(first_name=first_name, last_name=last_name,
-                address=address)
-            new_consultant.save()
-            return new_consultant
+            cursor = connection.cursor()
+            querystring = """
+                SELECT id FROM open_ballot_consultant
+                ORDER BY similarity(name, %s) DESC;
+                """
+
+            cursor.execute(querystring, [name])
+            most_similar_id = cursor.fetchone()[0]
+        except TypeError:
+            pass
+        else:
+            most_similar = cls.objects.get(id=most_similar_id)
+            #Run db-level query to find how strong of a match the input name
+            #is to the existing committee name.
+            cursor.execute(
+                'SELECT similarity(%s, %s);',
+                [name, most_similar.name])
+
+            fuzzy_match = cursor.fetchone()[0]
+            #Arbitrarily decided threshold of .7
+            if fuzzy_match >= .7:
+                return most_similar
+
+        new_consultant = cls(name=name)
+        new_consultant.save()
+        return new_consultant
 
 class Contract(BaseModel):
     class Meta:
@@ -197,7 +289,7 @@ class Donor(BaseModel):
 
         reprstring += ' >'
 
-        return reprstring
+        return unicode(reprstring).encode('utf-8')
 
 class Employer(BaseModel):
     class Meta:
@@ -208,15 +300,35 @@ class Employer(BaseModel):
     @classmethod
     def get_or_create(cls, name):
         try:
-            employer = Employer.objects.get(name=name)
-        except Employer.DoesNotExist:
-            employer = Employer(name=name)
-            employer.save()
+            cursor = connection.cursor()
+            querystring = """
+                SELECT id FROM open_ballot_employer
+                ORDER BY similarity(name, %s) DESC;
+                """
 
-        return employer
+            cursor.execute(querystring, [name])
+            most_similar_id = cursor.fetchone()[0]
+        except TypeError:
+            pass
+        else:
+            most_similar = cls.objects.get(id=most_similar_id)
+            #Run db-level query to find how strong of a match the input name
+            #is to the existing committee name.
+            cursor.execute(
+                'SELECT similarity(%s, %s);',
+                [name, most_similar.name])
+
+            fuzzy_match = cursor.fetchone()[0]
+            #Arbitrarily decided threshold of .7
+            if fuzzy_match >= .7:
+                return most_similar
+
+        new_employer = cls(name=name)
+        new_employer.save()
+        return new_employer
 
     def __repr__(self):
-        return '< Employer | Name: %s >' % self.name
+        return unicode('< Employer | Name: %s >' % self.name).encode('utf-8')
 
 class Donation(BaseModel):
     class Meta:
@@ -237,4 +349,4 @@ class Donation(BaseModel):
 
         reprstring += '| Committee: %s >' % self.committee.name
 
-        return reprstring
+        return unicode(reprstring).encode('utf-8')

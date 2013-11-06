@@ -3,7 +3,7 @@ import csv, re, os
 from configparser import ConfigParser
 from dateutil import parser
 
-from open_ballot.models import Donor, Committee, Donation, Employer
+from open_ballot.models import Donor, Committee, Donation, Employer, Election
 
 class Command(BaseCommand):
     args = '< filename >'
@@ -42,6 +42,7 @@ class Command(BaseCommand):
             'last_name': configparser.get('donations', 'last_name'),
             'transaction_date': configparser.get('donations', 'transaction_date'),
             'employer': configparser.get('donations', 'employer'),
+            'election_date': configparser.get('donations', 'election_date'),
             'filer_id': configparser.get('donations', 'filer_id'),
             'location': configparser.get('donations', 'location')
         }
@@ -54,12 +55,20 @@ class Command(BaseCommand):
             if not location:
                 continue
 
+            try:
+                election = Election.get_or_create(row[headers['election_date']])
+            except ValueError:
+                #Some idiot put in some years as 57815.  I ain't dealing with that shit.
+                continue
+
+            if not election or (election and not election.is_valid()):
+                continue
+
             location = location.replace('(', '').replace(')', '').split(',')
 
             latitude, longitude = float(location[0]), float(location[1])
             first_name = row[headers['first_name']]
             last_name = row[headers['last_name']]
-
 
             donor = Donor.get_or_create(first_name=first_name, last_name=last_name,
                 latitude=latitude, longitude=longitude)
@@ -75,7 +84,9 @@ class Command(BaseCommand):
             transaction_date = parser.parse(row[headers['transaction_date']]) 
 
             filer_id = row[headers['filer_id']]
-            committee = Committee.get_or_create(name=committee_name)
+
+            committee = Committee.get_or_create(name=committee_name,
+                election=election)
 
             committee.filer_id = filer_id
             committee.save()

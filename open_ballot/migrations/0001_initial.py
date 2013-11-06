@@ -16,11 +16,11 @@ class Migration(SchemaMigration):
             ('name', self.gf('django.db.models.fields.CharField')(max_length=300, null=True)),
             ('prop_id', self.gf('django.db.models.fields.CharField')(max_length=3)),
             ('description', self.gf('django.db.models.fields.TextField')(blank=True)),
-            ('election_date', self.gf('django.db.models.fields.DateField')()),
             ('num_yes', self.gf('django.db.models.fields.IntegerField')(null=True)),
             ('num_no', self.gf('django.db.models.fields.IntegerField')(null=True)),
             ('passed', self.gf('django.db.models.fields.NullBooleanField')(null=True, blank=True)),
             ('ballot_type', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.BallotType'], null=True)),
+            ('election', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.Election'], null=True)),
         ))
         db.send_create_signal('open_ballot', ['BallotMeasure'])
 
@@ -32,6 +32,15 @@ class Migration(SchemaMigration):
             ('tag', models.ForeignKey(orm['open_ballot.tag'], null=False))
         ))
         db.create_unique(m2m_table_name, ['ballotmeasure_id', 'tag_id'])
+
+        # Adding model 'Election'
+        db.create_table(u'open_ballot_election', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
+            ('date', self.gf('django.db.models.fields.DateField')()),
+        ))
+        db.send_create_signal('open_ballot', ['Election'])
 
         # Adding model 'BallotType'
         db.create_table(u'open_ballot_ballottype', (
@@ -59,11 +68,10 @@ class Migration(SchemaMigration):
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=300)),
             ('filer_id', self.gf('django.db.models.fields.CharField')(max_length=10, blank=True)),
+            ('sponsor', self.gf('django.db.models.fields.CharField')(max_length=300)),
+            ('election', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['open_ballot.Election'], null=True)),
         ))
         db.send_create_signal('open_ballot', ['Committee'])
-
-        # Adding unique constraint on 'Committee', fields ['name', 'filer_id']
-        db.create_unique(u'open_ballot_committee', ['name', 'filer_id'])
 
         # Adding model 'Stance'
         db.create_table(u'open_ballot_stance', (
@@ -84,8 +92,7 @@ class Migration(SchemaMigration):
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=300, blank=True)),
-            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=300)),
+            ('name', self.gf('django.db.models.fields.CharField')(max_length=300)),
             ('address', self.gf('django.db.models.fields.CharField')(max_length=300, blank=True)),
         ))
         db.send_create_signal('open_ballot', ['Consultant'])
@@ -158,14 +165,14 @@ class Migration(SchemaMigration):
         # Removing unique constraint on 'Stance', fields ['committee', 'ballot_measure']
         db.delete_unique(u'open_ballot_stance', ['committee_id', 'ballot_measure_id'])
 
-        # Removing unique constraint on 'Committee', fields ['name', 'filer_id']
-        db.delete_unique(u'open_ballot_committee', ['name', 'filer_id'])
-
         # Deleting model 'BallotMeasure'
         db.delete_table(u'open_ballot_ballotmeasure')
 
         # Removing M2M table for field tags on 'BallotMeasure'
         db.delete_table(db.shorten_name(u'open_ballot_ballotmeasure_tags'))
+
+        # Deleting model 'Election'
+        db.delete_table(u'open_ballot_election')
 
         # Deleting model 'BallotType'
         db.delete_table(u'open_ballot_ballottype')
@@ -204,7 +211,7 @@ class Migration(SchemaMigration):
             'ballot_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.BallotType']", 'null': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'election_date': ('django.db.models.fields.DateField', [], {}),
+            'election': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.Election']", 'null': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '300', 'null': 'True'}),
             'num_no': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
@@ -223,20 +230,21 @@ class Migration(SchemaMigration):
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.committee': {
-            'Meta': {'unique_together': "(('name', 'filer_id'),)", 'object_name': 'Committee'},
+            'Meta': {'object_name': 'Committee'},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'election': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['open_ballot.Election']", 'null': 'True'}),
             'filer_id': ('django.db.models.fields.CharField', [], {'max_length': '10', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
+            'sponsor': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.consultant': {
             'Meta': {'object_name': 'Consultant'},
             'address': ('django.db.models.fields.CharField', [], {'max_length': '300', 'blank': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '300', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.contract': {
@@ -269,6 +277,13 @@ class Migration(SchemaMigration):
             'last_name': ('django.db.models.fields.CharField', [], {'max_length': '300'}),
             'latitude': ('django.db.models.fields.FloatField', [], {}),
             'longitude': ('django.db.models.fields.FloatField', [], {}),
+            'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        'open_ballot.election': {
+            'Meta': {'object_name': 'Election'},
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'date': ('django.db.models.fields.DateField', [], {}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         'open_ballot.employer': {

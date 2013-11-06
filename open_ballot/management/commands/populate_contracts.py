@@ -5,7 +5,7 @@ from dateutil import parser
 from datetime import date
 
 from open_ballot.models import (BallotMeasure, Committee, Stance,
-    Consultant, Service, Contract)
+    Consultant, Service, Contract, Election)
 
 class Command(BaseCommand):
     args = '< filename >'
@@ -53,46 +53,54 @@ class Command(BaseCommand):
         reader = csv.DictReader(open(csv_file_path))
 
         for row in reader:
-            if len(row[headers['prop_id']]) > 3:
-                continue
+            try:
+                if len(row[headers['prop_id']]) > 3:
+                    continue
 
-            if row[headers['committee_name']]:
-                CurrentElection.set_committee(row[headers['committee_name']])
+                if row[headers['committee_name']]:
+                    CurrentElection.set_committee(row[headers['committee_name']])
 
-            if row[headers['election_date']] and row[headers['prop_id']]:
-                CurrentElection.set_ballot_measure(
-                    row[headers['election_date']],
-                    row[headers['prop_id']]
-                )
-
-            if row[headers['stance']]:
-                voted_yes = row[headers['stance']].lower().strip() == 'yes'
-                Stance.get_or_create(committee=CurrentElection.committee,
-                    ballot_measure=CurrentElection.ballot_measure,
-                    voted_yes=voted_yes)
-
-            if row[headers['consultant']]:
-                #TODO: Should we change this from last_name to something else?
-                #Are consultants ever independents?
-                consultant = Consultant.get_or_create(
-                    first_name='',
-                    last_name=row[headers['consultant']]
+                if row[headers['election_date']] and row[headers['prop_id']]:
+                    CurrentElection.set_ballot_measure(
+                        row[headers['election_date']],
+                        row[headers['prop_id']]
                     )
 
-                payment = row[headers['payment']]\
-                    .strip().replace('$', '').replace(',', '')
+                if not CurrentElection.election or \
+                    (CurrentElection.election and\
+                    not CurrentElection.election.is_valid()):
+                    continue
 
-                try:
-                    payment = float(payment)
-                except ValueError:
-                    payment = 0
+                if row[headers['stance']]:
+                    voted_yes = row[headers['stance']].lower().strip() == 'yes'
+                    Stance.get_or_create(committee=CurrentElection.committee,
+                        ballot_measure=CurrentElection.ballot_measure,
+                        voted_yes=voted_yes)
 
-                contract = Contract.get_or_create(
-                    consultant=consultant,
-                    committee=CurrentElection.committee,
-                    payment=payment,
-                    service_description=row[headers['service']]
-                    )
+                if row[headers['consultant']]:
+                    #TODO: Should we change this from last_name to something else?
+                    #Are consultants ever independents?
+                    consultant = Consultant.get_or_create(
+                        name=row[headers['consultant']]
+                        )
+
+                    payment = row[headers['payment']]\
+                        .strip().replace('$', '').replace(',', '')
+
+                    try:
+                        payment = float(payment)
+                    except ValueError:
+                        payment = 0
+
+                    contract = Contract.get_or_create(
+                        consultant=consultant,
+                        committee=CurrentElection.committee,
+                        payment=payment,
+                        service_description=row[headers['service']]
+                        )
+            except:
+                import ipdb;ipdb.set_trace()
+                raise
 
 class CurrentElection(object):
     ballot_measure = None
@@ -100,15 +108,13 @@ class CurrentElection(object):
 
     @staticmethod
     def set_ballot_measure(election_date, prop_id):
-        election_date_time = parser.parse(election_date)
-        election_date = date(year=election_date_time.year,
-            month=election_date_time.month,
-            day=election_date_time.day)
+        election = Election.get_or_create(election_date)
         ballot_measure = BallotMeasure.get_or_create(
-            election_date=election_date, prop_id=prop_id)
+            election=election, prop_id=prop_id)
         CurrentElection.ballot_measure = ballot_measure
 
     @staticmethod
     def set_committee(committee_name):
-        committee = Committee.get_or_create(name=committee_name)
-        CurrentElection.committee = committee
+        if committee_name not in ('', 'N/A'):
+            committee = Committee.get_or_create(name=committee_name)
+            CurrentElection.committee = committee
