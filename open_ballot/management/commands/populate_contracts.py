@@ -103,6 +103,7 @@ class Command(BaseCommand):
                 raise
 
 class CurrentElection(object):
+    election = None
     ballot_measure = None
     committee = None
 
@@ -112,6 +113,7 @@ class CurrentElection(object):
         ballot_measure = BallotMeasure.get_or_create(
             election=election, prop_id=prop_id)
         CurrentElection.ballot_measure = ballot_measure
+        CurrentElection.election = election
 
     @staticmethod
     def set_committee(committee_name):

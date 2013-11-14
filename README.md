@@ -22,3 +22,5 @@ To generate schemas:
 	install graphviz, libgraphviz-dev (apt-get for ubuntu, mac users, sorry)
 	pip install pygraphviz
 	./manage.py graph_models open_ballot -o schema.png
+
+Our postgresql uses an extension "pg_trgm" found in 

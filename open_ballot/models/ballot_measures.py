@@ -76,6 +76,15 @@ class Tag(BaseModel):
 
     name = models.CharField(max_length=300)
 
+    @classmethod
+    def get_or_create(cls, name):
+        try:
+            return cls.objects.get(name=name)
+        except Tag.DoesNotExist:
+            tag = cls(name=name)
+            tag.save()
+            return tag
+
 class Committee(BaseModel):
     class Meta:
         app_label = 'open_ballot'
