@@ -1,17 +1,17 @@
 Chameleon==2.14
-Mako==0.9.0
+Mako==0.9.1
 MarkupSafe==0.18
 PasteDeploy==1.5.0
 Pygments==1.6
-SQLAlchemy==0.8.4
+SQLAlchemy==0.9.1
 WebOb==1.3.1
-alembic==0.6.1
+alembic==0.6.2
 argparse==1.2.1
 configparser==3.3.0r2
 dateutils==0.6.6
 ipdb==0.8
 ipython==1.1.0
--e git+git@github.com:sfbrigade/open_ballot.git@f1881f7fcdb7cbd90134ca534302cb5edf66e7f7#egg=open_ballot-master
+-e git+git@github.com:sfbrigade/open_ballot.git@7441c5ee9642c043f65506d516d8850934dd0d6c#egg=open_ballot-master
 psycopg2==2.5.1
 pyramid==1.5a3
 pyramid-chameleon==0.1
