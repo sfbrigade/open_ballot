@@ -3,9 +3,12 @@ from configparser import ConfigParser
 from dateutil.parser import parse as date_parse
 from datetime import date
 
+from model_patches import election_get_or_create, tag_get_or_create
 from open_ballot.models import (BallotMeasure, Election, Tag, BallotType,
     BallotMeasureTag, DBSession)
 import transaction
+
+Election.get_or_create = election_get_or_create
 
 def parse_ballot_data(input_file):
     if type(input_file) in [str, unicode]:

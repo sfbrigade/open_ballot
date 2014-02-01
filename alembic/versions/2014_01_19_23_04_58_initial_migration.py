@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('created', sa.DateTime(timezone=True), server_default=func.now(), nullable=False),
     sa.Column('updated', sa.DateTime(timezone=True), server_default=func.now(), nullable=False),
     sa.Column('name', sa.Text(), nullable=False),
-    sa.Column('address', sa.Text(), nullable=False),
+    sa.Column('address', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table(u'service',
@@ -30,7 +30,7 @@ def upgrade():
     sa.Column('created', sa.DateTime(timezone=True), server_default=func.now(), nullable=False),
     sa.Column('updated', sa.DateTime(timezone=True), server_default=func.now(), nullable=False),
     sa.Column('name', sa.Text(), nullable=False),
-    sa.Column('description', sa.Text(), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table(u'ballot_type',
@@ -83,7 +83,7 @@ def upgrade():
     sa.Column('updated', sa.DateTime(timezone=True), server_default=func.now(), nullable=False),
     sa.Column('name', sa.Text(), nullable=False),
     sa.Column('filer_id', sa.Text(), nullable=True),
-    sa.Column('sponsor', sa.Text(), nullable=False),
+    sa.Column('sponsor', sa.Text(), nullable=True),
     sa.Column('election_id', postgresql.UUID(), nullable=True),
     sa.ForeignKeyConstraint(['election_id'], [u'election.id'], ),
     sa.PrimaryKeyConstraint('id')
@@ -95,7 +95,7 @@ def upgrade():
     sa.Column('updated', sa.DateTime(timezone=True), server_default=func.now(), nullable=False),
     sa.Column('name', sa.Text(), nullable=True),
     sa.Column('prop_id', sa.Text(), nullable=False),
-    sa.Column('description', sa.Text(), nullable=False),
+    sa.Column('description', sa.Text(), nullable=True),
     sa.Column('num_yes', sa.Integer(), nullable=True),
     sa.Column('num_no', sa.Integer(), nullable=True),
     sa.Column('passed', sa.Boolean(), nullable=True),
@@ -127,7 +127,8 @@ def upgrade():
     sa.Column('updated', sa.DateTime(timezone=True), server_default=func.now(), nullable=False),
     sa.Column('payment', sa.Float(), nullable=False),
     sa.Column('consultant_id', postgresql.UUID(), nullable=False),
-    sa.Column('service_id', postgresql.UUID(), nullable=False),
+    sa.Column('service_id', postgresql.UUID(), nullable=True),
+    sa.Column('description', sa.Text(), nullable=True),
     sa.Column('committee_id', postgresql.UUID(), nullable=False),
     sa.ForeignKeyConstraint(['committee_id'], [u'committee.id'], ),
     sa.ForeignKeyConstraint(['consultant_id'], [u'consultant.id'], ),

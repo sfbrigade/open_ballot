@@ -37,7 +37,7 @@ class BallotMeasure(Base):
 
     _name = Column('name', Text)
     prop_id = Column(Text, nullable=False)
-    description = Column(Text, nullable=False)
+    description = Column(Text)
     num_yes = Column(Integer)
     num_no = Column(Integer)
     passed = Column(Boolean)
@@ -79,7 +79,7 @@ class Committee(Base):
 
     name = Column(Text, nullable=False)
     filer_id = Column(Text)
-    sponsor = Column(Text, nullable=False)
+    sponsor = Column(Text)
     election_id = Column(ForeignKey(u'election.id'), index=True)
 
     election = relationship(u'Election', backref=backref('committees'))
@@ -89,15 +89,16 @@ class Consultant(Base):
     __tablename__ = u'consultant'
 
     name = Column(Text, nullable=False)
-    address = Column(Text, nullable=False)
+    address = Column(Text, nullable=True)
 
 
 class Contract(Base):
     __tablename__ = u'contract'
 
     payment = Column(Float, nullable=False)
+    description = Column(Text)
     consultant_id = Column(ForeignKey(u'consultant.id'), nullable=False, index=True)
-    service_id = Column(ForeignKey(u'service.id'), nullable=False, index=True)
+    service_id = Column(ForeignKey(u'service.id'), nullable=True)
     committee_id = Column(ForeignKey(u'committee.id'), nullable=False, index=True)
 
     committee = relationship(u'Committee', backref=backref('contracts'))
@@ -138,24 +139,6 @@ class Election(Base):
 
     date = Column(Date, nullable=False)
 
-    @classmethod
-    def get_or_create(cls, election_date):
-        if type(election_date) in [str, unicode]:
-            election_date = date_parse(election_date)
-
-        if type(election_date) == datetime.datetime:
-            election_date = datetime.date(year=election_date.year,
-                month=election_date.month,
-                day=election_date.day)
-
-        election = DBSession.query(cls).filter(cls.date==election_date).first()
-
-        if not election:
-            election = cls(date=election_date)
-            DBSession.add(election)
-
-        return election
-
 class Employer(Base):
     __tablename__ = u'employer'
 
@@ -166,7 +149,7 @@ class Service(Base):
     __tablename__ = u'service'
 
     name = Column(Text, nullable=False)
-    description = Column(Text, nullable=False)
+    description = Column(Text)
 
 
 class Stance(Base):
@@ -187,13 +170,3 @@ class Tag(Base):
     __tablename__ = u'tag'
 
     name = Column(Text, nullable=False)
-
-    @classmethod
-    def get_or_create(cls, name):
-        tag = DBSession.query(cls).filter(cls.name==name).first()
-        if not tag:
-            tag = cls(name=name)
-            DBSession.add(tag)
-            DBSession.flush()
-
-        return tag
