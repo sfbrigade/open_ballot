@@ -16,6 +16,13 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.include('pyramid_chameleon')
     config.add_static_view('static', 'static', cache_max_age=3600)
-    config.add_route('home', '/')
+    config.add_static_view(name='js/thirdparty', path='open_ballot:js/thirdparty')
+    config.add_static_view(name='partials', path='open_ballot:partials')
+
+    config.add_route('open_ballot', '/')
+
+    config.add_route('app', '/js/app.js')
+    config.add_view('open_ballot.views.app', route_name='app')
+
     config.scan()
     return config.make_wsgi_app()
