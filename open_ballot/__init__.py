@@ -18,6 +18,7 @@ def main(global_config, **settings):
     config.add_static_view('static', 'static', cache_max_age=3600)
     config.add_static_view(name='js/thirdparty', path='open_ballot:js/thirdparty')
     config.add_static_view(name='partials', path='open_ballot:partials')
+    config.add_static_view(name='data', path='../data')
 
     config.add_route('open_ballot', '/')
 
