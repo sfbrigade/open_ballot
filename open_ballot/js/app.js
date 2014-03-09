@@ -1,9 +1,12 @@
 require('./controllers');
+require('./services');
 
 var app = angular.module('openBallotApp', [
-      'ngRoute',
-      'openBallotControllers'
-    ]);
+  'ngRoute',
+  'ngResource',
+  'openBallotControllers',
+  'openBallotServices'
+]);
 
 app.config(['$routeProvider', function($routeProvider) {
   $routeProvider

@@ -5,13 +5,15 @@
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
   <link rel="shortcut icon" href="${request.static_url('open_ballot:static/favicon.ico')}" />
   <link rel="stylesheet" href="${request.static_url('open_ballot:static/bootstrap.css')}" type="text/css" media="screen" charset="utf-8" />
+  <link rel="stylesheet" href="${request.static_url('open_ballot:static/app.css')}" type="text/css" media="screen" charset="utf-8" />
   <script src="js/thirdparty/angular-1.2.11.min.js"></script>
   <script src="js/thirdparty/angular-route-1.2.11.min.js"></script>
+  <script src="js/thirdparty/angular-resource-1.2.11.min.js"></script>
 </head>
 <body>
   <div class="navbar navbar-inverse navbar-static-top">
     <div class="navbar-inner">
-      <a class="brand" href="#">Open Ballot</a>
+      <a class="navbar-brand" href="#">Open Ballot</a>
     </div>
   </div>
   <div class="container-fluid">

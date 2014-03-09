@@ -16,7 +16,10 @@
   "bugs": {
     "url": "https://github.com/adborden/open_ballot/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "csv-string": "~2.1.1",
+    "lazy.js": "~0.3.2"
+  },
   "devDependencies": {
     "browserify": "~3.32.0",
     "karma-script-launcher": "~0.1.0",
