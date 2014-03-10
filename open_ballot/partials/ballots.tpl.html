@@ -1,0 +1,17 @@
+<div>
+  <span id="text" class="lead">{{text}}</span>
+  <h2>Ballots</h2>
+  <ul class="container-fluid">
+    <li class="row-fluid header">
+      <span class="col-lg-4">Title</span>
+      <span class="col-lg-4">Date</span>
+      <span class="col-lg-4">Prop Letter</span>
+    </li>
+
+    <li class="row-fluid" ng-repeat="ballot in ballots">
+      <a ui-sref="ballot({id:ballot['ID']})"><span class="col-lg-4">{{ballot["PROPTitle"]}}</span></a>
+      <span class="col-lg-4">{{ballot["Date"]}}</span>
+      <span class="col-lg-4">{{ballot["PropLetter"]}}</span>
+    </li>
+  </ul>
+</div>

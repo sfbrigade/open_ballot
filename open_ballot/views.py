@@ -1,4 +1,9 @@
+import logging
+import os
+import subprocess
+
 from pyramid.response import Response
+from pyramid.response import FileResponse
 from pyramid.view import view_config
 
 from sqlalchemy.exc import DBAPIError
@@ -7,10 +12,22 @@ from .models import (
     DBSession,
     )
 
+BUILD_DIR = 'build'
 
-@view_config(route_name='home', renderer='templates/mytemplate.pt')
+logger = logging.getLogger(__name__)
+
+@view_config(route_name='open_ballot', renderer='templates/index.pt')
 def my_view(request):
     return {'one': 'one', 'project': 'open_ballot'}
+
+def app(request):
+    logger.info('Building app...')
+    if not os.path.exists(BUILD_DIR):
+        os.mkdir(BUILD_DIR)
+    subprocess.call(['browserify',
+                     'open_ballot/js/app.js',
+                     '-o', 'build/bundle.js'])
+    return FileResponse('build/bundle.js', request=request)
 
 conn_err_msg = """\
 Pyramid is having a problem using your SQL database.  The problem

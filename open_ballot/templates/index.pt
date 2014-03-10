@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal" ng-app="openBallotApp">
+<head>
+  <title>Open Ballot</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+  <link rel="shortcut icon" href="${request.static_url('open_ballot:static/favicon.ico')}" />
+  <link rel="stylesheet" href="${request.static_url('open_ballot:static/bootstrap.css')}" type="text/css" media="screen" charset="utf-8" />
+  <link rel="stylesheet" href="${request.static_url('open_ballot:static/app.css')}" type="text/css" media="screen" charset="utf-8" />
+  <script src="js/thirdparty/angular-1.2.11.min.js"></script>
+  <script src="js/thirdparty/angular-resource-1.2.11.min.js"></script>
+  <script src="js/thirdparty/angular-ui-router-0.2.8.js"></script>
+</head>
+<body>
+  <div class="navbar navbar-inverse navbar-static-top">
+    <div class="navbar-inner">
+      <a class="navbar-brand" href="#">Open Ballot</a>
+    </div>
+  </div>
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <h1>Open Ballot</h1>
+      <div id="content" class="view-container">
+        <div ui-view class="view-frame"></div>
+      </div>
+    </div>
+  </div>
+  <script src="js/app.js"></script>
+</body>
+</html>
