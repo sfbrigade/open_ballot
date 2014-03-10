@@ -10,7 +10,7 @@ describe('app', function() {
       scope = {};
       inject(function($controller) {
         // Initialize the controller
-        $controller('helloworldController', {
+        $controller('contractsController', {
           $scope: scope
         });
       });
