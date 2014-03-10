@@ -35,3 +35,4 @@ nosetests.xml
 .pydevproject
 
 node_modules
+venv

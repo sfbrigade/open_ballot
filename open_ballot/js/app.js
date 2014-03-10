@@ -11,7 +11,11 @@ var app = angular.module('openBallotApp', [
 app.config(['$routeProvider', function($routeProvider) {
   $routeProvider
     .when('/', {
-      templateUrl: 'partials/helloworld.html',
-      controller: 'helloworldController'
+      templateUrl: 'partials/contracts.tpl.html',
+      controller: 'contractsController'
+    })
+    .when('/ballots', {
+      templateUrl: 'partials/ballots.tpl.html',
+      controller: 'ballotsController'
     });
 }]);
