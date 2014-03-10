@@ -7,8 +7,8 @@
   <link rel="stylesheet" href="${request.static_url('open_ballot:static/bootstrap.css')}" type="text/css" media="screen" charset="utf-8" />
   <link rel="stylesheet" href="${request.static_url('open_ballot:static/app.css')}" type="text/css" media="screen" charset="utf-8" />
   <script src="js/thirdparty/angular-1.2.11.min.js"></script>
-  <script src="js/thirdparty/angular-route-1.2.11.min.js"></script>
   <script src="js/thirdparty/angular-resource-1.2.11.min.js"></script>
+  <script src="js/thirdparty/angular-ui-router-0.2.8.js"></script>
 </head>
 <body>
   <div class="navbar navbar-inverse navbar-static-top">
@@ -20,7 +20,7 @@
     <div class="row-fluid">
       <h1>Open Ballot</h1>
       <div id="content" class="view-container">
-        <div ng-view class="view-frame"></div>
+        <div ui-view class="view-frame"></div>
       </div>
     </div>
   </div>
