@@ -1,4 +1,5 @@
 require('./controllers');
+require('./directives');
 require('./services');
 
 var app = angular.module('openBallotApp', [
@@ -6,6 +7,7 @@ var app = angular.module('openBallotApp', [
   'ui.router',
 
   'openBallotControllers',
+  'openBallotDirectives',
   'openBallotServices'
 ]);
 
