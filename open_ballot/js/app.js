@@ -1,3 +1,4 @@
+require('highcharts-ng');
 require('./controllers');
 require('./directives');
 require('./services');
@@ -5,6 +6,7 @@ require('./services');
 var app = angular.module('openBallotApp', [
   'ngResource',
   'ui.router',
+  'highcharts-ng',
 
   'openBallotControllers',
   'openBallotDirectives',
@@ -29,5 +31,10 @@ app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $ur
       url: '/ballots/:id',
       templateUrl: 'partials/ballot.tpl.html',
       controller: 'ballotController'
+    })
+    .state('contributions', {
+      url: '/contributions',
+      templateUrl: 'partials/ballot_contributions.tpl.html',
+      controller: 'ballotContributionsController'
     });
 }]);

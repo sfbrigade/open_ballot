@@ -18,7 +18,8 @@
   },
   "dependencies": {
     "csv-string": "~2.1.1",
-    "lazy.js": "~0.3.2"
+    "lazy.js": "~0.3.2",
+    "highcharts-ng": "git+https://github.com/adborden/highcharts-ng.git#62e7aa2d621758ebd21131e47f98ac6d5d653ccf"
   },
   "devDependencies": {
     "browserify": "~3.32.0",

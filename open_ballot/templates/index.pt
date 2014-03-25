@@ -9,6 +9,8 @@
   <script src="js/thirdparty/angular-1.2.11.min.js"></script>
   <script src="js/thirdparty/angular-resource-1.2.11.min.js"></script>
   <script src="js/thirdparty/angular-ui-router-0.2.8.js"></script>
+  <script src="http://code.highcharts.com/adapters/standalone-framework.js"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
 </head>
 <body>
   <div class="navbar navbar-inverse navbar-static-top">
