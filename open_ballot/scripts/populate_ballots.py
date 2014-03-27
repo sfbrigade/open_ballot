@@ -9,6 +9,7 @@ from open_ballot.models import (BallotMeasure, Election, Tag, BallotType,
 import transaction
 
 Election.get_or_create = election_get_or_create
+Tag.get_or_create = tag_get_or_create
 
 def parse_ballot_data(input_file):
     if type(input_file) in [str, unicode]:
@@ -42,7 +43,7 @@ def parse_ballot_data(input_file):
                 row[headers['num_votes']]]:
                 continue
 
-            ballot_measure = BallotMeasure()
+            ballot_measure = BallotMeasure(election=election)
 
             ballot_measure.name = row[headers['name']]
             ballot_measure.description = row[headers['description']]
@@ -60,7 +61,17 @@ def parse_ballot_data(input_file):
             tag = Tag.get_or_create(row[headers['issue']])
             ballot_type = DBSession.query(BallotType).filter(
                 BallotType.name==row[headers['type']].title()).first()
+            if not ballot_type:
+                percent_required = row[headers['percent_required']]
+                if percent_required == '66 2/3%':
+                    percent = 2.0/3
+                else:
+                    percent = .50
 
+                ballot_type = BallotType(name=row[headers['type']].title(),
+                    percent_required=percent)
+
+            ballot_measure.ballot_type = ballot_type
             BallotMeasureTag(ballot_measure=ballot_measure, tag=tag)
             DBSession.add(ballot_measure)
             transaction.commit()

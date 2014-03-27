@@ -44,6 +44,16 @@ def consultant_get_or_create(cls, name):
 	return consultant
 
 @classmethod
+def employer_get_or_create(cls, name):
+	employer = DBSession.query(cls).filter(cls.name==name).first()
+	if not employer:
+	    employer = cls(name=name)
+	    DBSession.add(employer)
+	    DBSession.flush()
+
+	return employer
+
+@classmethod
 def committee_get_or_create(cls, name, election):
 	committee = DBSession.query(cls).filter(
 		cls.name==name,
@@ -71,3 +81,18 @@ def ballot_measure_get_or_create(cls, prop_id, election):
 		DBSession.flush()
 
 	return ballot_measure
+
+@classmethod
+def donor_get_or_create(cls, first_name, last_name, latitude, longitude):
+	donor = DBSession.query(cls).filter(
+		cls.first_name==first_name, cls.last_name==last_name,
+		cls.latitude==latitude, cls.longitude==longitude
+		).first()
+
+	if not donor:
+		donor = cls(first_name=first_name, last_name=last_name,
+            latitude=latitude, longitude=longitude)
+		DBSession.add(donor)
+		DBSession.flush()
+
+	return donor

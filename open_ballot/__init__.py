@@ -22,6 +22,7 @@ def main(global_config, **settings):
 
     config.add_route('open_ballot', '/')
 
+    config.add_route('ajax_get_ballots', '/ajax/ballots')
     config.add_route('app', '/js/app.js')
     config.add_view('open_ballot.views.app', route_name='app')
 

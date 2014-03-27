@@ -23,6 +23,10 @@ class BallotBase(object):
         server_onupdate='now()', server_default='now()')
 
     @classmethod
+    def all(cls):
+        return DBSession.query(cls).all()
+
+    @classmethod
     def get_by_id(cls, id):
         return DBSession.query(cls).filter(cls.id==id).first()
 
@@ -126,7 +130,7 @@ class Donor(Base):
 
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=False)
-    address = Column(Text, nullable=False)
+    address = Column(Text)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     employer_id = Column(ForeignKey(u'employer.id'), index=True)

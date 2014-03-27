@@ -9,16 +9,20 @@ from pyramid.view import view_config
 from sqlalchemy.exc import DBAPIError
 
 from .models import (
-    DBSession,
+    DBSession, BallotMeasure
     )
 
 BUILD_DIR = 'build'
 
 logger = logging.getLogger(__name__)
 
-@view_config(route_name='open_ballot', renderer='templates/index.pt')
-def my_view(request):
-    return {'one': 'one', 'project': 'open_ballot'}
+class BaseView(object):
+    def __init__(self, request):
+        self.request = request
+
+    @view_config(route_name='open_ballot', renderer='templates/index.pt')
+    def my_view(self):
+        return {'one': 'one', 'project': 'open_ballot'}
 
 def app(request):
     logger.info('Building app...')
@@ -29,19 +33,34 @@ def app(request):
                      '-o', 'build/bundle.js'])
     return FileResponse('build/bundle.js', request=request)
 
-conn_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
+class BallotAjaxView(BaseView):
+    @view_config(route_name='ajax_get_ballots', renderer='json',
+        request_method='GET')
+    def get_ballots(self):
+        ballot_measure_jsons = []
 
-1.  You may need to run the "initialize_open_ballot_db" script
-    to initialize your database tables.  Check your virtual 
-    environment's "bin" directory for this script and try to run it.
+        for ballot_measure in BallotMeasure.all():
+            ballot_measure_json = {
+                'id': ballot_measure.id,
+                'prop_id': ballot_measure.prop_id,
+                'description': ballot_measure.description,
+                'num_yes': ballot_measure.num_yes,
+                'num_no': ballot_measure.num_no,
+                'passed': ballot_measure.passed,
+                'election': {
+                    'date': ballot_measure.election.date.isoformat()
+                }
+            }
 
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
+            if ballot_measure.ballot_type:
+                ballot_measure_json.update({'ballot_type': {
+                    'name': ballot_measure.ballot_type.name,
+                    'percent_required':\
+                        float(ballot_measure.ballot_type.percent_required)
+                    }
+                }
+            )
 
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""
+            ballot_measure_jsons.append(ballot_measure_json)
 
+        return ballot_measure_jsons
