@@ -7,9 +7,10 @@ from pyramid.response import FileResponse
 from pyramid.view import view_config
 
 from sqlalchemy.exc import DBAPIError
+from sqlalchemy import and_
 
 from .models import (
-    DBSession, BallotMeasure
+    DBSession, BallotMeasure, Committee, Stance
     )
 
 BUILD_DIR = 'build'
@@ -37,6 +38,11 @@ class BallotAjaxView(BaseView):
     @view_config(route_name='ajax_get_ballots', renderer='json',
         request_method='GET')
     def get_ballots(self):
+        '''
+        Returns a list of all ballots.  Called with GET /ajax/ballots
+        Note that some ballot measures are missing a ballot type.
+        '''
+
         ballot_measure_jsons = []
 
         for ballot_measure in BallotMeasure.all():
@@ -64,3 +70,36 @@ class BallotAjaxView(BaseView):
             ballot_measure_jsons.append(ballot_measure_json)
 
         return ballot_measure_jsons
+
+    @view_config(route_name='ajax_get_donations', renderer='json',
+        request_method='GET')
+    def get_committees(self):
+        '''
+        Get the committees working on a ballot measure, with their stance.
+        Called by GET /ajax/ballots/{id}/committees
+        '''
+        committee_jsons = []
+
+        ballot_measure = BallotMeasure.get_by_id(self.request.matchdict['id'])
+        committees = DBSession.query(Committee).join(
+            Stance, and_(
+                Stance.ballot_measure_id==ballot_measure.id,
+                Stance.committee_id==Committee.id)
+            )
+
+        for committee in committees:
+            committee_json = {
+                'id': committee.id,
+                'name': committee.name,
+                'election': {
+                    'date': committee.election.date.isoformat()
+                },
+                'stance': {
+                    #TODO: Rename this to "supported"?
+                    'voted_yes': committee.stance.voted_yes
+                }
+            }
+
+            committee_jsons.append(committee_json)
+
+        return committee_jsons
