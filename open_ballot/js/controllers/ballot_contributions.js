@@ -5,23 +5,6 @@ controllers.controller('ballotContributionsController', ['$scope', 'api', '$stat
   var committieeData, stanceData, colors, committees, color;
   colors = Highcharts.getOptions().colors;
 
-  function _stance(stance) {
-    if (stance === "Yes") {
-      return "Supports";
-    } else if (stance === "No") {
-      return "Against";
-    } else {
-      return "Unknown";
-    }
-  }
-
-  function _payment(payment) {
-    var p, m;
-    m = payment.replace(/[^\d]/g, '');
-    p = parseInt(m);
-    return Number.isNaN(p) ? 0 : p;
-  }
-
   function _color(stance) {
     return {
       "Supports": "#2f7ed8",
@@ -82,27 +65,16 @@ controllers.controller('ballotContributionsController', ['$scope', 'api', '$stat
     loading: false
   };
 
-  //TODO: only fetch the contracts we need
-  api.contracts.query().$promise.then(function(data){
-    var committee = null;
-    for (var i = 0; i < data.length; i++) {
-      var contract = data[i];
-      if (committee === null ||
-        (contract["Ballot Measure"] !== null && contract["Ballot Measure"] != committee["Ballot Measure"])) {
-
-        // Next committee
-        committee = {
-          name: contract["Ballot Measure Committee"],
-          stance: _stance(contract["Stance"]),
-          y: _payment(contract["Payment Received"]),
-          color: _color(_stance(contract["Stance"]))
-        };
-        $scope.committees.push(committee);
-      } else {
-        committee.y += _payment(contract["Payment Received"]); // Add the contribution
-      }
-    }
-
+  api.committees.query({ballot_id: $stateParams.ballot_id}).$promise.then(function(data){
+    data.forEach(function (committee) {
+      var stance = committee.stance.voted_yes ? "Supports" : "Against";
+      $scope.committees.push({
+        name: committee.name,
+        stance: stance,
+        y: committee.total_spend,
+        color: _color(stance)
+      });
+    });
     updateChart($scope.committees);
   });
 }]);

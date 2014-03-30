@@ -10,7 +10,7 @@ from sqlalchemy.exc import DBAPIError
 from sqlalchemy import and_
 
 from .models import (
-    DBSession, BallotMeasure, Committee, Stance
+    DBSession, BallotMeasure, Committee, Contract, Stance
     )
 
 BUILD_DIR = 'build'
@@ -85,9 +85,17 @@ class BallotAjaxView(BaseView):
             Stance, and_(
                 Stance.ballot_measure_id==ballot_measure.id,
                 Stance.committee_id==Committee.id)
+            ).join(
+                Contract, and_(
+                    Contract.committee_id==Committee.id
+                )
             )
 
         for committee in committees:
+            # Sum the contracts
+            total_spend = sum(map(lambda contract: contract.payment,
+                committee.contracts))
+
             committee_json = {
                 'id': committee.id,
                 'name': committee.name,
@@ -97,7 +105,8 @@ class BallotAjaxView(BaseView):
                 'stance': {
                     #TODO: Rename this to "supported"?
                     'voted_yes': committee.stance.voted_yes
-                }
+                },
+                'total_spend': total_spend
             }
 
             committee_jsons.append(committee_json)

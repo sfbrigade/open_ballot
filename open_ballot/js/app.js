@@ -33,7 +33,7 @@ app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $ur
       controller: 'ballotController'
     })
     .state('contributions', {
-      url: '/contributions',
+      url: '/ballots/:ballot_id/contributions',
       templateUrl: 'partials/ballot_contributions.tpl.html',
       controller: 'ballotContributionsController'
     });
