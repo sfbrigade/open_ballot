@@ -18,7 +18,9 @@ app.controller('ballotContributionsController', ['$scope', 'api', '$stateParams'
       .pairs()
       .sortBy(function(pair) {
         return pair[0]; // stance
-      }).toArray();
+      })
+      .reverse()
+      .toArray();
 
     stanceData = lazy(stanceCommitteePairs)
       .map(function (pair) {
@@ -43,7 +45,11 @@ app.controller('ballotContributionsController', ['$scope', 'api', '$stateParams'
     $scope.contributions.series.push({
       name: 'Stance',
       data: stanceData,
-      size: '60%'
+      size: '60%',
+      dataLabels: {
+        color: 'white',
+        distance: -40
+      }
     });
     $scope.contributions.series.push({
       name: 'Committees',
@@ -73,7 +79,7 @@ app.controller('ballotContributionsController', ['$scope', 'api', '$stateParams'
         name: committee.name,
         stance: stance,
         y: committee.total_spend,
-        color: _color(stance)
+        color: Highcharts.Color(_color(stance)).brighten(0.2).get()
       });
       $scope.total_spend += committee.total_spend;
     });
