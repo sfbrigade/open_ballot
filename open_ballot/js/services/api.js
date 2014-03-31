@@ -27,6 +27,7 @@ services.service('api', ['$resource', function($resource) {
   };
 
   return {
+    ballots: $resource('/ajax/ballots/:ballot_id', {ballot_id: '@ballot_id'}),
     ballot_history: simpleDataResourceFactory('/data/ballot_history'),
     contracts: simpleDataResourceFactory('/data/contracts'),
     committees: $resource('/ajax/ballots/:ballot_id/committees'),

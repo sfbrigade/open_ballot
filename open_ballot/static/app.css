@@ -1,3 +1,30 @@
-#hello-world ul .header {
-  font-weight: bold;
+.navbar {
+  margin-bottom: 0;
+}
+
+#title {
+  float: left;
+  padding: 15px 15px;
+  color: #CCC;
+}
+
+#ballot-view #panel-left {
+  height: 100%;
+  position: relative;
+}
+
+#ballot-view #panel-left:after {
+  background: linear-gradient(to right, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 100%);
+  content: '';
+  display: block;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 10px;
+}
+
+
+.data-chart {
+  min-height: 400px;
 }

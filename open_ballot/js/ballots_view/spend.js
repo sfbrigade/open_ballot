@@ -1,7 +1,7 @@
 var lazy = require('lazy.js');
-var controllers = angular.module('openBallotControllers');
+var app = angular.module('open_ballot.ballots');
 
-controllers.controller('ballotContributionsController', ['$scope', 'api', '$stateParams', function($scope, api, $stateParams) {
+app.controller('ballotContributionsController', ['$scope', 'api', '$stateParams', function($scope, api, $stateParams) {
   var committieeData, stanceData, colors, committees, color;
   colors = Highcharts.getOptions().colors;
 
@@ -55,6 +55,7 @@ controllers.controller('ballotContributionsController', ['$scope', 'api', '$stat
     $scope.contributions.loading = false;
   }
 
+  $scope.total_spend = 0;
   $scope.committees = [];
   $scope.contributions = {
     options: {
@@ -74,6 +75,7 @@ controllers.controller('ballotContributionsController', ['$scope', 'api', '$stat
         y: committee.total_spend,
         color: _color(stance)
       });
+      $scope.total_spend += committee.total_spend;
     });
     updateChart($scope.committees);
   });

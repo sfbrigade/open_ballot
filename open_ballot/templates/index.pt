@@ -16,16 +16,10 @@
   <div class="navbar navbar-inverse navbar-static-top">
     <div class="navbar-inner">
       <a class="navbar-brand" href="#">Open Ballot</a>
+      <span id="title" ng-if="title">{{title}}</span>
     </div>
   </div>
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <h1>Open Ballot</h1>
-      <div id="content" class="view-container">
-        <div ui-view class="view-frame"></div>
-      </div>
-    </div>
-  </div>
+  <div ui-view class="view-frame"></div>
   <script src="js/app.js"></script>
 </body>
 </html>

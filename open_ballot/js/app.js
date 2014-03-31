@@ -3,14 +3,16 @@ require('./controllers');
 require('./directives');
 require('./services');
 
+require('./ballots_view');
+
 var app = angular.module('openBallotApp', [
-  'ngResource',
   'ui.router',
   'highcharts-ng',
 
   'openBallotControllers',
   'openBallotDirectives',
-  'openBallotServices'
+  'openBallotServices',
+  'open_ballot.ballots'
 ]);
 
 app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
