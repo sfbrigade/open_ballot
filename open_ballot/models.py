@@ -1,5 +1,6 @@
 # coding: utf-8
-from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import (Boolean, Column, Date, DateTime, Float, ForeignKey,
+    Integer, Numeric, String, Text, func)
 from sqlalchemy.dialects.postgresql.base import UUID
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.ext.declarative import declarative_base
@@ -25,6 +26,10 @@ class BallotBase(object):
     @classmethod
     def all(cls):
         return DBSession.query(cls).all()
+
+    @classmethod
+    def first(cls):
+        return DBSession.query(cls).first()
 
     @classmethod
     def get_by_id(cls, id):
@@ -88,6 +93,21 @@ class Committee(Base):
 
     election = relationship(u'Election', backref=backref('committees'))
 
+    @property
+    def donation_total(self):
+        return DBSession.query(
+            func.sum(Donation.amount)
+            ).filter(
+            Donation.committee_id==self.id
+            ).first()[0]
+
+    @property
+    def total_spent(self):
+        return DBSession.query(
+            func.sum(Contract.payment)
+            ).filter(
+            Contract.committee_id==self.id
+            ).first()[0]
 
 class Consultant(Base):
     __tablename__ = u'consultant'

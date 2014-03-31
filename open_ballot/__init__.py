@@ -5,7 +5,7 @@ from .models import (
     DBSession,
     Base,
     )
-
+import api_urls
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -22,9 +22,13 @@ def main(global_config, **settings):
 
     config.add_route('open_ballot', '/')
 
-    config.add_route('ajax_get_ballots', '/ajax/ballots')
-    config.add_route('ajax_get_ballot', '/ajax/ballots/{id}')
-    config.add_route('ajax_get_donations', '/ajax/ballots/{id}/committees')
+    for ListClass in api_urls.ListUrl.__subclasses__():
+        config.add_route(ListClass.get_list_route(), ListClass.get_list_url())
+
+    for ResourceClass in api_urls.ResourceUrl.__subclasses__():
+        config.add_route(ResourceClass.get_resource_route(),
+            ResourceClass.get_routing_url())
+
     config.add_route('app', '/js/app.js')
     config.add_view('open_ballot.views.app', route_name='app')
 
