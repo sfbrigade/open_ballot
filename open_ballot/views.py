@@ -46,6 +46,7 @@ class BallotAjaxView(BaseView):
         ballot_measure = BallotMeasure.get_by_id(self.request.matchdict['id'])
         ballot_measure_json = {
             'id': ballot_measure.id,
+            'name': ballot_measure._name,
             'prop_id': ballot_measure.prop_id,
             'description': ballot_measure.description,
             'num_yes': ballot_measure.num_yes,
@@ -80,6 +81,7 @@ class BallotAjaxView(BaseView):
         for ballot_measure in BallotMeasure.all():
             ballot_measure_json = {
                 'id': ballot_measure.id,
+                'name': ballot_measure._name,
                 'prop_id': ballot_measure.prop_id,
                 'description': ballot_measure.description,
                 'num_yes': ballot_measure.num_yes,
