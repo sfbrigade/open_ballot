@@ -56,12 +56,12 @@ def employer_get_or_create(cls, name):
 @classmethod
 def committee_get_or_create(cls, name, election):
 	committee = DBSession.query(cls).filter(
-		cls.name==name,
+		cls.name==name.title(),
 		cls.election==election
 		).first()
 
 	if not committee:
-		committee = cls(name=name, election=election)
+		committee = cls(name=name.title(), election=election)
 		DBSession.add(committee)
 		DBSession.flush()
 

@@ -173,11 +173,11 @@ class Stance(Base):
     )
 
     voted_yes = Column(Boolean, nullable=False)
-    committee_id = Column(ForeignKey(u'committee.id'), nullable=False, index=True)
+    committee_id = Column(ForeignKey(u'committee.id'), nullable=False)
     ballot_measure_id = Column(ForeignKey(u'ballot_measure.id'), nullable=False, index=True)
 
     ballot_measure = relationship(u'BallotMeasure', backref=backref('stances'))
-    committee = relationship(u'Committee', backref=backref('stance', uselist=False))
+    committee = relationship(u'Committee', backref=backref('stances'))
 
 
 class Tag(Base):

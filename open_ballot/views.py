@@ -104,14 +104,14 @@ class BallotAjaxView(BaseView):
                 )
             )
 
-        ballot_measure_jsons['committees'] = {}
+        ballot_measure_json['committees'] = []
         for committee in committees:
-            ballot_measure_jsons['committees'][committee.id] = {
+            ballot_measure_json['committees'].append({
                 'id': committee.id,
                 'name': committee.name,
                 'resource':\
                     api_urls.CommitteeUrl.get_resource_url(committee.id)
-            }
+            })
 
         return ballot_measure_json
 
@@ -167,27 +167,37 @@ class BallotAjaxView(BaseView):
             'election': {
                 'date': committee.election.date.isoformat()
             },
-            'stance': {
-                #TODO: Rename this to "supported"?
-                'voted_yes': committee.stance.voted_yes
-            }
         }
 
-        committee_json['contracts'] = {}
+        committee_json['ballot_measures'] = []
+        for stance in committee.stances:
+            committee_json['ballot_measures'].append({
+                'id': stance.ballot_measure_id,
+                'name': stance.ballot_measure.name,
+                'resource':\
+                    api_urls.BallotUrl.get_resource_url(
+                        stance.ballot_measure_id
+                        ),
+                'stance': {
+                    'voted_yes': stance.voted_yes 
+                }
+                })
+
+        committee_json['contracts'] = []
         for contract in committee.contracts:
-            committee_json['contracts'][contract.id] = {
+            committee_json['contracts'].append({
                 'id': contract.id,
                 'description': contract.description,
                 'resource': api_urls.ContractUrl.get_resource_url(contract.id)
-            }
+            })
 
-        committee_json['donations'] = {}
+        committee_json['donations'] = []
         for donation in committee.donations:
-            committee_json['donations'][donation.id] = {
+            committee_json['donations'].append({
                 'id': donation.id,
                 'amount': donation.amount,
                 'resource': api_urls.DonationUrl.get_resource_url(donation.id)
-            }
+            })
 
         return committee_json
 
@@ -245,13 +255,13 @@ class BallotAjaxView(BaseView):
             'address': consultant.address
         }
 
-        consultant_json['contracts'] = {}
+        consultant_json['contracts'] = []
         for contract in consultant.contracts:
-            consultant_json['contracts'][contract.id] = {
+            consultant_json['contracts'].append({
                 'id': contract.id,
                 'description': contract.description,
                 'resource': api_urls.ContractUrl.get_resource_url(contract.id)
-            }
+            })
 
         return consultant_json
 
@@ -289,6 +299,8 @@ class BallotAjaxView(BaseView):
             'resource': api_urls.DonorUrl.get_resource_url(donor.id)
         }
 
+        return donation_json
+
     @view_config(route_name=api_urls.DonorUrl.get_resource_route(),
         renderer='json', request_method='GET')
     def get_donor_resource(self):
@@ -306,10 +318,12 @@ class BallotAjaxView(BaseView):
             'last_name': donor.last_name,
         }
 
-        donor_json['donations'] = {}
+        donor_json['donations'] = []
         for donation in donor.donations:
-            donor_json['donations'][donor.id] = {
+            donor_json['donations'].append({
                 'id': donation.id,
                 'amount': donation.amount,
                 'resource': api_urls.DonationUrl.get_resource_url(donation.id)
-            }
+            })
+
+        return donor_json

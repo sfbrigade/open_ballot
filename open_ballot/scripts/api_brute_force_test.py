@@ -31,7 +31,7 @@ if __name__ == '__main__':
         for model, url_class in url_reference.iteritems():
             for obj in model.all():
                 response = requests.get(host+url_class.get_resource_url(obj.id))
-                response.json()
+                assert response.json() != None
     except ValueError:
         import ipdb;ipdb.set_trace()
         raise
