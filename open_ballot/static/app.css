@@ -34,25 +34,30 @@
 }
 
 #ballot-view .grid {
-  font-size: 36px;
-  padding: 30px 30px;
+  font-size: 24px;
+  padding: 60px;
 }
 
 #ballot-view .grid .grid-cell {
   float: left;
   width: 50%;
-  height: 3em;
+  line-height: 1.4em;
+  padding: 50px;
+}
+
+#ballot-view .grid .grid-value {
+  font-size: 96px;
   line-height: 1.4em;
 }
 
 #ballot-view .grid .grid-cell:nth-child(1),
 #ballot-view .grid .grid-cell:nth-child(3) {
-  border-right: 3px solid #99B;
+  border-right: 3px solid #777;
 }
 
 #ballot-view .grid .grid-cell:nth-child(3),
 #ballot-view .grid .grid-cell:nth-child(4) {
-  border-top: 3px solid #99B;
+  border-top: 3px solid #777;
 }
 
 
