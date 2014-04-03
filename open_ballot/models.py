@@ -122,12 +122,10 @@ class Contract(Base):
     payment = Column(Float, nullable=False)
     description = Column(Text)
     consultant_id = Column(ForeignKey(u'consultant.id'), nullable=False, index=True)
-    service_id = Column(ForeignKey(u'service.id'), nullable=True)
     committee_id = Column(ForeignKey(u'committee.id'), nullable=False, index=True)
 
     committee = relationship(u'Committee', backref=backref('contracts'))
     consultant = relationship(u'Consultant', backref=backref('contracts'))
-    service = relationship(u'Service', backref=backref('contracts'))
 
 
 class Donation(Base):
@@ -167,14 +165,6 @@ class Employer(Base):
     __tablename__ = u'employer'
 
     name = Column(Text, nullable=False)
-
-
-class Service(Base):
-    __tablename__ = u'service'
-
-    name = Column(Text, nullable=False)
-    description = Column(Text)
-
 
 class Stance(Base):
     __tablename__ = u'stance'

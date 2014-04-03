@@ -6,7 +6,7 @@ from model_patches import (election_get_or_create, consultant_get_or_create,
     committee_get_or_create, ballot_measure_get_or_create)
 
 from open_ballot.models import (BallotMeasure, Committee, Stance,
-    Consultant, Service, Contract, Election, DBSession)
+    Consultant, Contract, Election, DBSession)
 
 Election.get_or_create = election_get_or_create
 Consultant.get_or_create = consultant_get_or_create

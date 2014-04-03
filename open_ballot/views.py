@@ -86,8 +86,7 @@ class BallotAjaxView(BaseView):
             }
         }
 
-        if ballot_measure.ballot_type:
-            ballot_measure_json.update({'ballot_type': {
+        ballot_measure_json.update({'ballot_type': {
                 'name': ballot_measure.ballot_type.name,
                 'percent_required':\
                     float(ballot_measure.ballot_type.percent_required)
@@ -208,12 +207,6 @@ class BallotAjaxView(BaseView):
             'description': contract.description,
             'payment': contract.payment
         }
-
-        if contract.service:
-            contract_json['service'] = {
-                'name': contract.service.name,
-                'description': contract.service.description
-            }
 
         consultant = contract.consultant
 
