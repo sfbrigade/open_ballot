@@ -1,5 +1,4 @@
 <div id="ballot-view">
-    <div ui-view></div>
     <div class="container-fluid">
         <div class="row">
             <div id="panel-left" class="col-lg-5">
@@ -7,11 +6,11 @@
                     <div ui-view="ballot.votes"></div>
                 </div>
                 <div class="data-chart">
-                    <div ui-view="ballot.spend"></div>
+                    <div ui-view="ballot.spent"></div>
                 </div>
             </div>
             <div id="main" class="col-lg-7">
-                <img src="static/map_placeholder.png" />
+                <div ui-view></div>
             </div>
         </div>
     </div>

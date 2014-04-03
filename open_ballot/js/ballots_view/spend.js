@@ -1,7 +1,7 @@
 var lazy = require('lazy.js');
 var app = angular.module('open_ballot.ballots');
 
-app.controller('ballotContributionsController', ['$scope', 'api', '$stateParams', function($scope, api, $stateParams) {
+app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'ballot', '$stateParams', function($scope, $q, api, ballot, $stateParams) {
   var committieeData, stanceData, colors, committees, color;
   colors = Highcharts.getOptions().colors;
 
@@ -61,7 +61,7 @@ app.controller('ballotContributionsController', ['$scope', 'api', '$stateParams'
     $scope.contributions.loading = false;
   }
 
-  $scope.total_spend = 0;
+  $scope.total_spent = 0;
   $scope.committees = [];
   $scope.contributions = {
     options: {
@@ -72,17 +72,36 @@ app.controller('ballotContributionsController', ['$scope', 'api', '$stateParams'
     loading: false
   };
 
-  api.committees.query({ballot_id: $stateParams.ballot_id}).$promise.then(function(data){
-    data.forEach(function (committee) {
-      var stance = committee.stance.voted_yes ? "Supports" : "Against";
-      $scope.committees.push({
-        name: committee.name,
-        stance: stance,
-        y: committee.total_spend,
-        color: Highcharts.Color(_color(stance)).brighten(0.2).get()
+
+  committees = [];
+  ballot.$promise.then(function (ballot) {
+    ballot.total_spent = 0;
+    ballot.donation_total = 0;
+
+    committees = lazy(ballot.committees)
+      .map(function (committee) {
+        return api.committees.get({id: committee.id}).$promise;
+      })
+      .toArray();
+
+    $q.all(committees).then(function (data) {
+      data.forEach(function (committee) {
+        var stance = lazy(committee.ballot_measures)
+        .find(function (ballot_measure) {
+          return ballot_measure.id === ballot.id;
+        }).stance.voted_yes ? "Supports" : "Against";
+
+        ballot.total_spent += committee.total_spent;
+        ballot.donation_total += committee.donation_total;
+        $scope.committees.push({
+          name: committee.name,
+          stance: stance,
+          y: committee.total_spent,
+          color: Highcharts.Color(_color(stance)).brighten(0.2).get()
+        });
+        $scope.total_spent += committee.total_spent;
       });
-      $scope.total_spend += committee.total_spend;
+      updateChart($scope.committees);
     });
-    updateChart($scope.committees);
   });
 }]);

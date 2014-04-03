@@ -51,7 +51,11 @@ class BallotAjaxView(BaseView):
         for ballot_measure in BallotMeasure.all():
             ballot_measure_json = {
                 'id': ballot_measure.id,
-                'description': ballot_measure.description,
+                'name': ballot_measure.name,
+                'prop_id': ballot_measure.prop_id,
+                'election': {
+                    'date': ballot_measure.election.date.isoformat()
+                },
                 'resource':\
                     api_urls.BallotUrl.get_resource_url(ballot_measure.id)
             }
@@ -77,6 +81,7 @@ class BallotAjaxView(BaseView):
         ballot_measure_json = {
             'id': ballot_measure.id,
             'prop_id': ballot_measure.prop_id,
+            'name': ballot_measure.name,
             'description': ballot_measure.description,
             'num_yes': ballot_measure.num_yes,
             'num_no': ballot_measure.num_no,
@@ -86,13 +91,14 @@ class BallotAjaxView(BaseView):
             }
         }
 
-        ballot_measure_json.update({'ballot_type': {
-                'name': ballot_measure.ballot_type.name,
-                'percent_required':\
-                    float(ballot_measure.ballot_type.percent_required)
+        if ballot_measure.ballot_type:
+            ballot_measure_json.update({'ballot_type': {
+                    'name': ballot_measure.ballot_type.name,
+                    'percent_required':\
+                        float(ballot_measure.ballot_type.percent_required)
+                    }
                 }
-            }
-        )
+            )
 
         committees = DBSession.query(Committee).join(
             Stance, and_(

@@ -6,8 +6,8 @@ controllers.controller('ballotsController', ['$scope', 'api', function($scope, a
   $scope.ballots.$promise.then(function (ballots) {
     lazy(ballots)
       .each(function (ballot) {
-        api.committees.query({ballot_id: ballot.id}).$promise.then(function (committees) {
-          ballot.committee_count = committees.length;
+        api.ballots.get({ballot_id: ballot.id}).$promise.then(function (b) {
+          ballot.committees = b.committees;
         });
       });
   });

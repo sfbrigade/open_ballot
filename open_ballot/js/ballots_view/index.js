@@ -12,9 +12,12 @@ app.config(['$stateProvider', function($stateProvider) {
     .state('ballots_view.index', {
       url: '/:ballot_id',
       views: {
-        '': {controller: 'ballot.controller'},
+        '': {
+          templateUrl: 'partials/ballot_view/main.tpl.html',
+          controller: 'ballot.controller'
+        },
         'ballot.votes': {template: '<h3>Vote counts</h3>'},
-        'ballot.spend': {
+        'ballot.spent': {
           templateUrl: 'partials/ballot_contributions.tpl.html',
           controller: 'ballotContributionsController'
         }
@@ -27,8 +30,9 @@ app.config(['$stateProvider', function($stateProvider) {
     });
 }]);
 
-app.controller('ballot.controller', ['$rootScope', 'ballot', function ($rootScope, ballot) {
+app.controller('ballot.controller', ['$rootScope', '$scope', 'ballot', function ($rootScope, $scope, ballot) {
+  $scope.ballot = ballot;
   ballot.$promise.then(function (ballot) {
-    $rootScope.title = "Prop " + ballot.prop_id + ": " + ballot.description;
+    $rootScope.title = "Prop " + ballot.prop_id + ": " + ballot.name;
   });
 }]);

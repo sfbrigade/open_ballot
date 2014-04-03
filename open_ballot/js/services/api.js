@@ -4,7 +4,7 @@ var csv = require('csv-string'),
 var services = angular.module('openBallotServices');
 
 services.service('api', ['$resource', function($resource) {
-  simpleDataResourceFactory = function(url) {
+  var simpleDataResourceFactory = function(url) {
     url = url + ".csv";
     return $resource(url, null, {
       query: {
@@ -14,23 +14,37 @@ services.service('api', ['$resource', function($resource) {
           parsed = csv.parse(data);
           headers = parsed.shift();
           return lazy(parsed).map(function(rowData) {
-              var row = {};
-              headers.forEach(function(key, idx) {
-                row[key] = rowData[idx];
-              });
+            var row = {};
+            headers.forEach(function(key, idx) {
+              row[key] = rowData[idx];
+            });
 
-              return row;
-            }).toArray();
+            return row;
+          }).toArray();
+        }
+      }
+    });
+  };
+
+  var indexedDataResourceFactory = function (url) {
+    return $resource(url, null, {
+      query: {
+        method: 'GET',
+        isArray: true,
+        transformResponse: function (data) {
+          return lazy(angular.fromJson(data))
+            .values()
+            .toArray();
         }
       }
     });
   };
 
   return {
-    ballots: $resource('/ajax/ballots/:ballot_id', {ballot_id: '@ballot_id'}),
+    ballots: indexedDataResourceFactory('/api/v1/ballots/:ballot_id', {ballot_id: '@ballot_id'}),
     ballot_history: simpleDataResourceFactory('/data/ballot_history'),
     contracts: simpleDataResourceFactory('/data/contracts'),
-    committees: $resource('/ajax/ballots/:ballot_id/committees'),
+    committees: indexedDataResourceFactory('/api/v1/committees/:id', {id: '@id'}),
     donations: simpleDataResourceFactory('/data/donations')
   };
 
