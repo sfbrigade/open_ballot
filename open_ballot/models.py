@@ -1,5 +1,6 @@
 # coding: utf-8
-from sqlalchemy import Boolean, Column, Date, DateTime, Float, ForeignKey, Integer, Numeric, String, Text
+from sqlalchemy import (Boolean, Column, Date, DateTime, Float, ForeignKey,
+    Integer, Numeric, String, Text, func)
 from sqlalchemy.dialects.postgresql.base import UUID
 from sqlalchemy.dialects.postgresql import *
 from sqlalchemy.ext.declarative import declarative_base
@@ -25,6 +26,10 @@ class BallotBase(object):
     @classmethod
     def all(cls):
         return DBSession.query(cls).all()
+
+    @classmethod
+    def first(cls):
+        return DBSession.query(cls).first()
 
     @classmethod
     def get_by_id(cls, id):
@@ -88,6 +93,21 @@ class Committee(Base):
 
     election = relationship(u'Election', backref=backref('committees'))
 
+    @property
+    def donation_total(self):
+        return DBSession.query(
+            func.sum(Donation.amount)
+            ).filter(
+            Donation.committee_id==self.id
+            ).first()[0]
+
+    @property
+    def total_spent(self):
+        return DBSession.query(
+            func.sum(Contract.payment)
+            ).filter(
+            Contract.committee_id==self.id
+            ).first()[0]
 
 class Consultant(Base):
     __tablename__ = u'consultant'
@@ -102,12 +122,10 @@ class Contract(Base):
     payment = Column(Float, nullable=False)
     description = Column(Text)
     consultant_id = Column(ForeignKey(u'consultant.id'), nullable=False, index=True)
-    service_id = Column(ForeignKey(u'service.id'), nullable=True)
     committee_id = Column(ForeignKey(u'committee.id'), nullable=False, index=True)
 
     committee = relationship(u'Committee', backref=backref('contracts'))
     consultant = relationship(u'Consultant', backref=backref('contracts'))
-    service = relationship(u'Service', backref=backref('contracts'))
 
 
 class Donation(Base):
@@ -148,14 +166,6 @@ class Employer(Base):
 
     name = Column(Text, nullable=False)
 
-
-class Service(Base):
-    __tablename__ = u'service'
-
-    name = Column(Text, nullable=False)
-    description = Column(Text)
-
-
 class Stance(Base):
     __tablename__ = u'stance'
     __table_args__ = (
@@ -163,7 +173,7 @@ class Stance(Base):
     )
 
     voted_yes = Column(Boolean, nullable=False)
-    committee_id = Column(ForeignKey(u'committee.id'), nullable=False, index=True)
+    committee_id = Column(ForeignKey(u'committee.id'), nullable=False)
     ballot_measure_id = Column(ForeignKey(u'ballot_measure.id'), nullable=False, index=True)
 
     ballot_measure = relationship(u'BallotMeasure', backref=backref('stances'))

@@ -6,7 +6,7 @@ from model_patches import (election_get_or_create, consultant_get_or_create,
     committee_get_or_create, ballot_measure_get_or_create)
 
 from open_ballot.models import (BallotMeasure, Committee, Stance,
-    Consultant, Service, Contract, Election, DBSession)
+    Consultant, Contract, Election, DBSession)
 
 Election.get_or_create = election_get_or_create
 Consultant.get_or_create = consultant_get_or_create
@@ -35,55 +35,59 @@ def parse_contract_data(input_file):
     'payment': configparser.get('contracts', 'payment')
     }
 
+    flag = False
     for row in reader:
         try:
-            if not row[headers['consultant']]:
+            if row[headers['committee_name']] in ['', 'N/A']:
                 continue
 
-            election = Election.get_or_create(row[headers['election_date']])
-            committee = Committee.get_or_create(
-                name=row[headers['committee_name']],
-                election=election)
+            with DBSession.no_autoflush:
+                election = Election.get_or_create(row[headers['election_date']])
+                committee = Committee.get_or_create(
+                    name=row[headers['committee_name']],
+                    election=election)
 
-            ballot_measure = BallotMeasure.get_or_create(
-                row[headers['prop_id']],
-                election)
+                ballot_measure = BallotMeasure.get_or_create(
+                    row[headers['prop_id']],
+                    election)
 
-            voted_yes = row[headers['stance']].lower().strip() == 'yes'
+                voted_yes = row[headers['stance']].lower().strip() == 'yes'
 
-            stance = DBSession.query(Stance).filter(
-                Stance.committee==committee,
-                Stance.ballot_measure==ballot_measure
-                ).first()
+                stance = DBSession.query(Stance).filter(
+                    Stance.committee_id==committee.id,
+                    Stance.ballot_measure_id==ballot_measure.id
+                    ).first()
 
-            if not stance:
-                Stance(
-                    committee=committee,
-                    ballot_measure=ballot_measure,
-                    voted_yes=voted_yes
+                if not stance:
+                    stance = Stance(
+                        committee=committee,
+                        ballot_measure=ballot_measure,
+                        voted_yes=voted_yes)
+                    name = committee.name
+
+                if not row[headers['consultant']]:
+                    transaction.commit()
+                    continue
+                consultant = Consultant.get_or_create(
+                    name=row[headers['consultant']]
                     )
 
-            #TODO: Should we change this from last_name to something else?
-            #Are consultants ever independents?
-            consultant = Consultant.get_or_create(
-                name=row[headers['consultant']]
-                )
+                payment = row[headers['payment']]\
+                    .strip().replace('$', '').replace(',', '')
 
-            payment = row[headers['payment']]\
-                .strip().replace('$', '').replace(',', '')
+                try:
+                    payment = float(payment)
+                except ValueError:
+                    payment = 0
 
-            try:
-                payment = float(payment)
-            except ValueError:
-                payment = 0
-
-            Contract(
-                consultant=consultant,
-                committee=committee,
-                payment=payment,
-                description=row[headers['service']]
-                )
-            transaction.commit()
+                Contract(
+                    consultant=consultant,
+                    committee=committee,
+                    payment=payment,
+                    description=row[headers['service']]
+                    )
+                transaction.commit()
         except:
             import ipdb;ipdb.set_trace()
             raise
+

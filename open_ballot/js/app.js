@@ -1,17 +1,20 @@
-require('highcharts-ng');
-require('./controllers');
-require('./directives');
-require('./services');
-
 var app = angular.module('openBallotApp', [
-  'ngResource',
   'ui.router',
   'highcharts-ng',
 
   'openBallotControllers',
   'openBallotDirectives',
-  'openBallotServices'
+  'openBallotServices',
+  'open_ballot.ballots'
 ]);
+
+require('highcharts-ng');
+require('./controllers');
+require('./directives');
+require('./services');
+require('./filters');
+
+require('./ballots_view');
 
 app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
@@ -33,7 +36,7 @@ app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $ur
       controller: 'ballotController'
     })
     .state('contributions', {
-      url: '/contributions',
+      url: '/ballots/:ballot_id/contributions',
       templateUrl: 'partials/ballot_contributions.tpl.html',
       controller: 'ballotContributionsController'
     });

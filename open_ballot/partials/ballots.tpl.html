@@ -1,17 +1,19 @@
 <div>
   <span id="text" class="lead">{{text}}</span>
   <h2>Ballots</h2>
-  <ul class="container-fluid">
-    <li class="row-fluid header">
+  <ul class="container-fluid ballots-list">
+    <li class="row header">
       <span class="col-lg-4">Title</span>
       <span class="col-lg-4">Date</span>
-      <span class="col-lg-4">Prop Letter</span>
+      <span class="col-lg-2">Prop Letter</span>
+      <span class="col-lg-2">Committes Involved</span>
     </li>
 
-    <li class="row-fluid" ng-repeat="ballot in ballots">
-      <a ui-sref="ballot({id:ballot['ID']})"><span class="col-lg-4">{{ballot["PROPTitle"]}}</span></a>
-      <span class="col-lg-4">{{ballot["Date"]}}</span>
-      <span class="col-lg-4">{{ballot["PropLetter"]}}</span>
+    <li class="row" ng-repeat="ballot in ballots">
+      <a ui-sref="ballots_view.index({ballot_id: ballot.id})"><span class="col-lg-4">{{ballot.name || (ballot | json)}}</span></a>
+      <span class="col-lg-4">{{ballot.election.date}}</span>
+      <span class="col-lg-2">{{ballot.prop_id}}</span>
+      <span class="col-lg-2">{{ballot.committees.length}}</span>
     </li>
   </ul>
 </div>
