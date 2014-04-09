@@ -4,8 +4,8 @@
   <title>Open Ballot</title>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
   <link rel="shortcut icon" href="${request.static_url('open_ballot:static/favicon.ico')}" />
-  <link rel="stylesheet" href="${request.static_url('open_ballot:static/bootstrap.css')}" type="text/css" media="screen" charset="utf-8" />
-  <link rel="stylesheet" href="${request.static_url('open_ballot:static/app.css')}" type="text/css" media="screen" charset="utf-8" />
+  <link rel="stylesheet" href="${request.static_url('open_ballot:static/css/bootstrap.css')}" type="text/css" media="screen" charset="utf-8" />
+  <link rel="stylesheet" href="${request.static_url('open_ballot:static/css/app.css')}" type="text/css" media="screen" charset="utf-8" />
   <script src="js/thirdparty/angular-1.2.11.min.js"></script>
   <script src="js/thirdparty/angular-resource-1.2.11.min.js"></script>
   <script src="js/thirdparty/angular-ui-router-0.2.8.js"></script>
@@ -15,7 +15,8 @@
 <body>
   <div class="navbar navbar-inverse navbar-static-top">
     <div class="navbar-inner">
-      <a class="navbar-brand" href="#">Open Ballot</a>
+	  <a class="navbar-brand" href="#"><img src="${request.static_url('open_ballot:static/images/logo.png')}" alt="Open Ballot Logo" width="350" height="100"></a>
+	  
       <span id="title" ng-if="title">{{title}}</span>
     </div>
   </div>
