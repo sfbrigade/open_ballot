@@ -46,20 +46,21 @@
 }
 
 #ballot-view .grid .grid-value {
-  font-size: 96px;
-  line-height: 1.4em;
+  font-size: 76px;
+  line-height: .75em;
 }
 
-#ballot-view .grid .grid-cell:nth-child(1),
-#ballot-view .grid .grid-cell:nth-child(3) {
+#ballot-view .grid .grid-cell:nth-child(100),
+#ballot-view .grid .grid-cell:nth-child(300) {
   border-right: 3px solid #777;
 }
 
-#ballot-view .grid .grid-cell:nth-child(3),
+#ballot-view .grid .grid-cell:nth-child(1),
+#ballot-view .grid .grid-cell:nth-child(2), #ballot-view .grid .grid-cell:nth-child(3),
 #ballot-view .grid .grid-cell:nth-child(4) {
-  border-top: 3px solid #777;
+   border-top: .05em dotted #777;
 }
-
+#ballot-view .grid-label {color:#666;font-size:70%;text-transform:uppercase;}
 
 ///////////////
 // ballots
