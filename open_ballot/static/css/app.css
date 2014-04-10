@@ -39,7 +39,6 @@
 }
 
 #ballot-view .grid .grid-cell {
-  float: left;
   width: 50%;
   line-height: 1.4em;
   padding: 50px;
