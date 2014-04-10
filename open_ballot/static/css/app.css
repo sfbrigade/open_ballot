@@ -35,13 +35,13 @@
 
 #ballot-view .grid {
   font-size: 24px;
-  padding: 60px;
+  padding: 50px;
 }
 
 #ballot-view .grid .grid-cell {
   width: 50%;
   line-height: 1.4em;
-  padding: 50px;
+  padding: 40px;
 }
 
 #ballot-view .grid .grid-value {
@@ -54,7 +54,6 @@
   border-right: 3px solid #777;
 }
 
-#ballot-view .grid .grid-cell:nth-child(1),
 #ballot-view .grid .grid-cell:nth-child(2), #ballot-view .grid .grid-cell:nth-child(3),
 #ballot-view .grid .grid-cell:nth-child(4) {
    border-top: .05em dotted #777;
