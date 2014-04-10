@@ -1,6 +1,6 @@
 <div class="grid clearfix">
     <div class="grid-cell spent">
-        <div class="grid-value">${{ballot.total_spent | metric}}</div>
+        <div class="grid-value">${{ballot.animations.total_spent.value | metric}}</div>
         <div class="grid-label">Total spent</div>
     </div>
     <div class="grid-cell committees">
@@ -8,11 +8,11 @@
         <div class="grid-label">Committees</div>
     </div>
     <div class="grid-cell votes">
-        <div class="grid-value">{{100 * ballot.num_yes / (ballot.num_no + ballot.num_yes) | number:0}}%</div>
+        <div class="grid-value">{{100 * ballot.animations.num_yes.value / (ballot.num_no + ballot.num_yes) | number:0}}%</div>
         <div class="grid-label">Voted yes</div>
     </div>
     <div class="grid-cell donations">
-        <div class="grid-value">${{ballot.donation_total | metric}}</div>
+        <div class="grid-value">${{ballot.animations.donation_total.value | metric}}</div>
         <div class="grid-label">Total raised</div>
     </div>
 </div>
