@@ -30,9 +30,11 @@ app.config(['$stateProvider', function($stateProvider) {
     });
 }]);
 
-app.controller('ballot.controller', ['$rootScope', '$scope', 'ballot', function ($rootScope, $scope, ballot) {
+app.controller('ballot.controller', ['$rootScope', '$scope', 'animateNumber', 'ballot', function ($rootScope, $scope, animateNumber, ballot) {
   $scope.ballot = ballot;
   ballot.$promise.then(function (ballot) {
+    ballot.animations = ballot.animations || {};
+    ballot.animations.num_yes = animateNumber(ballot.num_yes);
     $rootScope.title = "Prop " + ballot.prop_id + ": " + ballot.name;
   });
 }]);

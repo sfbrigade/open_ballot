@@ -1,7 +1,7 @@
 var lazy = require('lazy.js');
 var app = angular.module('open_ballot.ballots');
 
-app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'ballot', '$stateParams', function($scope, $q, api, ballot, $stateParams) {
+app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'animateNumber', 'ballot', '$stateParams', function($scope, $q, api, animateNumber, ballot, $stateParams) {
   var committieeData, stanceData, colors, committees, color;
   colors = Highcharts.getOptions().colors;
 
@@ -61,7 +61,6 @@ app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'ballot'
     $scope.contributions.loading = false;
   }
 
-  $scope.total_spent = 0;
   $scope.committees = [];
   $scope.contributions = {
     options: {
@@ -75,6 +74,7 @@ app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'ballot'
 
   committees = [];
   ballot.$promise.then(function (ballot) {
+    ballot.animations = ballot.animations || {};
     ballot.total_spent = 0;
     ballot.donation_total = 0;
 
@@ -99,8 +99,12 @@ app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'ballot'
           y: committee.total_spent,
           color: Highcharts.Color(_color(stance)).brighten(0.2).get()
         });
-        $scope.total_spent += committee.total_spent;
       });
+
+      // Big numbers
+      ballot.animations.donation_total = animateNumber(ballot.donation_total);
+      ballot.animations.total_spent = animateNumber(ballot.total_spent);
+
       updateChart($scope.committees);
     });
   });
