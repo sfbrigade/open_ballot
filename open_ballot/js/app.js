@@ -18,7 +18,7 @@ require('./ballots_view');
 
 app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
-  $urlRouterProvider.otherwise("/contracts");
+  $urlRouterProvider.otherwise("/ballots");
   $stateProvider
     .state('contracts', {
       url: '/contracts',
