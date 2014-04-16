@@ -29,15 +29,5 @@ app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $ur
       url: '/ballots',
       templateUrl: 'partials/ballots.tpl.html',
       controller: 'ballotsController'
-    })
-    .state('ballot', {
-      url: '/ballots/:id',
-      templateUrl: 'partials/ballot.tpl.html',
-      controller: 'ballotController'
-    })
-    .state('contributions', {
-      url: '/ballots/:ballot_id/contributions',
-      templateUrl: 'partials/ballot_contributions.tpl.html',
-      controller: 'ballotContributionsController'
     });
 }]);

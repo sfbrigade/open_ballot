@@ -1,6 +1,7 @@
 var app = angular.module('open_ballot.ballots', ['ui.router', 'highcharts-ng', 'openBallotServices']);
 
 require('./spend');
+require('../controllers/ballot');
 
 app.config(['$stateProvider', function($stateProvider) {
   $stateProvider
@@ -16,7 +17,10 @@ app.config(['$stateProvider', function($stateProvider) {
           templateUrl: 'partials/ballot_view/main.tpl.html',
           controller: 'ballot.controller'
         },
-        'ballot.votes': {template: '<h3>Vote counts</h3>'},
+        'ballot.votes': {
+          templateUrl: 'partials/ballot.tpl.html',
+          controller: 'ballotController'
+        },
         'ballot.spent': {
           templateUrl: 'partials/ballot_contributions.tpl.html',
           controller: 'ballotContributionsController'

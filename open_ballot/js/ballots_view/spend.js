@@ -57,7 +57,6 @@ app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'animate
       size: '80%',
       innerSize: '60%'
     });
-    $scope.contributions.title = {text: 'Contributions'};
     $scope.contributions.loading = false;
   }
 
@@ -67,7 +66,7 @@ app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'animate
       chart: {type: 'pie'}
     },
     series: [],
-    title: {text: 'Contributions'},
+    title: {text: 'Campaign Expenditures'},
     loading: false
   };
 

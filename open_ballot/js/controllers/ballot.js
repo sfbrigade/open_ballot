@@ -1,11 +1,15 @@
 var lazy = require('lazy.js');
-var controllers = angular.module('openBallotControllers');
+var controllers = angular.module('open_ballot.ballots');
 
-controllers.controller('ballotController', ['$scope', 'api', '$stateParams', function($scope, api, $stateParams) {
-  api.ballot_history.query().$promise.then(function(data){
-    // TODO: This should be in the api service and not re-query for ballots
-    $scope.ballot = lazy(data).findWhere({'ID': $stateParams.id});
-    $scope.ballot_config.series[0].data.push(['Yes votes', parseInt($scope.ballot.Vote_Counts_Yes)], ['No votes', parseInt($scope.ballot.Vote_Counts_No)]);
+controllers.controller('ballotController', ['$scope', 'api', '$stateParams', 'ballot', function($scope, api, $stateParams, ballot) {
+  ballot.$promise.then(function (ballot) {
+    $scope.ballot = ballot
+    $scope.ballot_config.series.push({
+        type: 'pie',
+        name: 'to come',
+        innerSize: '50%',
+        data: [['Yes votes', parseInt($scope.ballot.num_yes)], ['No votes', parseInt($scope.ballot.num_no)]]
+    });
     console.log($scope.ballot);
   });
 
@@ -18,24 +22,10 @@ controllers.controller('ballotController', ['$scope', 'api', '$stateParams', fun
                 endAngle: 90
             }
         },
-
-      chart: {
-        type: 'pie'}
+      chart: {type: 'pie'}
     },
-
-      series: [{
-            type: 'pie',
-            name: 'to come',
-            innerSize: '50%',
-            data: []
-        }],
-    
+    series: [],
     title: {text: 'Vote count'},
     loading: false
   };
-
-
 }]);
-
-
-    

@@ -28,11 +28,6 @@
   width: 10px;
 }
 
-
-#ballot-view .data-chart {
-  min-height: 400px;
-}
-
 #ballot-view .grid {
   font-size: 24px;
   padding: 50px;
