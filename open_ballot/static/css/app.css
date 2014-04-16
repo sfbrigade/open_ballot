@@ -67,6 +67,15 @@
   margin-bottom: 10px;
 }
 
+tr:nth-child(even)   { background-color:#eee; }
+tr:nth-child(odd)    { background-color:#fff; }
+
+#ballots table th, #ballots table td {border-right:2px solid #ffffff; 
+    border-bottom: 1px dotted #cccccc;
+    border-spacing: 2px;
+    border-collapse: separate;
+    }
+#ballots table th{color:#0e7ab8;background-color:#fff;}
 ///////////////
 // buttons
 ///////////////
