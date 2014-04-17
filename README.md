@@ -52,6 +52,8 @@ $ npm install
 
 $ export PATH=./node_modules/.bin:$PATH # You’ll need to do this everytime you open your shell OR add it to your virtualenv's active script
 
+$ pip install -e /path/to/this/project
+
 $ python setup.py develop
 
 $ initialize_open_ballot_db development.ini
