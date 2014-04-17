@@ -50,7 +50,8 @@ $ pip install -r requirements.txt
 
 $ npm install
 
-$ export PATH=./node_modules/.bin:$PATH # You’ll need to do this everytime you open your shell OR add it to your virtualenv's active script
+$ export PATH=./node_modules/.bin:$PATH # You’ll need to do this everytime you open your shell
+#OR add it to your virtualenv's activate script
 
 $ pip install -e /path/to/this/project
 
