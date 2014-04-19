@@ -3,18 +3,18 @@
   <h2>Ballots</h2>
   <table>
      <tr>
-		<th class="col-lg-4">Title</th>
+        <th class="col-lg-4">Title</th>
      	<th class="col-lg-4">Date</th>
      	<th class="col-lg-2">Prop Letter</th>
      	<th class="col-lg-2">Committes Involved</th>
-	 </tr>
-	 
-	 <tr>
-	     <td class="row" ng-repeat="ballot in ballots">
-	       <a ui-sref="ballots_view.index({ballot_id: ballot.id})"><span class="col-lg-4">{{ballot.name || (ballot | json)}}</span></a></td>  
-	       <td class="col-lg-4">{{ballot.election.date | date:'yyyy'}}</td>
-	       <td class="col-lg-2">{{ballot.prop_id}}</td>
-	       <td class="col-lg-2">{{ballot.committees.length}}</td>
-	 </tr>
+     </tr>
+     <tr ng-repeat="ballot in ballots | orderBy:'election.date':true">
+         <td>
+             <a ui-sref="ballots_view.index({ballot_id: ballot.id})"><span>{{ballot.name || (ballot | json)}}</span></a>
+         </td>
+         <td>{{ballot.election.date | date:'yyyy'}}</td>
+         <td>{{ballot.prop_id}}</td>
+         <td>{{ballot.committees.length}}</td>
+     </tr>
   </table>
 </div>
