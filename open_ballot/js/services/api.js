@@ -1,7 +1,7 @@
 var csv = require('csv-string'),
     lazy = require('lazy.js');
 
-var services = angular.module('openBallotServices');
+var services = angular.module('open_ballot.services');
 
 services.service('api', ['$resource', function($resource) {
   var simpleDataResourceFactory = function(url) {

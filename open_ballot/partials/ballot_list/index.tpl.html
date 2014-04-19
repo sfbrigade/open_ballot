@@ -10,7 +10,7 @@
      </tr>
      <tr ng-repeat="ballot in ballots | orderBy:'election.date':true">
          <td>
-             <a ui-sref="ballots_view.index({ballot_id: ballot.id})"><span>{{ballot.name || (ballot | json)}}</span></a>
+             <a ui-sref="ballots.index({ballot_id: ballot.id})"><span>{{ballot.name || (ballot | json)}}</span></a>
          </td>
          <td>{{ballot.election.date | date:'yyyy'}}</td>
          <td>{{ballot.prop_id}}</td>

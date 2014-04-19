@@ -1,4 +1,4 @@
-var app = angular.module('openBallotServices');
+var app = angular.module('open_ballot.services');
 
 app.service('animateNumber', ['$interval', '$rootScope', function ($interval, $rootScope) {
 

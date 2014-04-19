@@ -1,4 +1,4 @@
-var directives = angular.module('openBallotDirectives', []);
+var directives = angular.module('open_ballot.directives', []);
 
 directives.directive('animatedNumberDirective', ['$interval', '$filter', function ($interval, $filter) {
   return {

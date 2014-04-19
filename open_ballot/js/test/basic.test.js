@@ -1,6 +1,6 @@
 describe('app', function() {
   beforeEach(function() {
-    module('openBallotApp');
+    module('open_ballot');
   });
 
   describe('scope', function() {

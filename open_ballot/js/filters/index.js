@@ -1,5 +1,5 @@
 lazy = require('lazy.js');
-var app = angular.module('openBallotApp');
+var app = angular.module('open_ballot');
 
 app.filter('metric', ['$filter', function ($filter) {
 

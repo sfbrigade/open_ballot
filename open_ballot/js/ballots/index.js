@@ -1,29 +1,29 @@
-var app = angular.module('open_ballot.ballots', ['ui.router', 'highcharts-ng', 'openBallotServices']);
+var app = angular.module('open_ballot.ballots', ['ui.router', 'highcharts-ng', 'open_ballot.services']);
 
 require('./spend');
-require('../controllers/ballot');
+require('./votes');
 
 app.config(['$stateProvider', function($stateProvider) {
   $stateProvider
-    .state('ballots_view', {
+    .state('ballots', {
       abstract: true,
-      url: '/ballots_view',
-      templateUrl: 'partials/ballots_view.tpl.html'
+      url: '/ballots',
+      templateUrl: 'partials/ballots/index.tpl.html'
     })
-    .state('ballots_view.index', {
+    .state('ballots.index', {
       url: '/:ballot_id',
       views: {
-        '': {
-          templateUrl: 'partials/ballot_view/main.tpl.html',
-          controller: 'ballot.controller'
+        'ballots.numbers': {
+          templateUrl: 'partials/ballots/numbers.tpl.html',
+          controller: 'numbersController'
         },
-        'ballot.votes': {
-          templateUrl: 'partials/ballot.tpl.html',
-          controller: 'ballotController'
+        'ballots.votes': {
+          templateUrl: 'partials/ballots/votes.tpl.html',
+          controller: 'votesController'
         },
-        'ballot.spent': {
-          templateUrl: 'partials/ballot_contributions.tpl.html',
-          controller: 'ballotContributionsController'
+        'ballots.spend': {
+          templateUrl: 'partials/ballots/spend.tpl.html',
+          controller: 'spendController'
         }
       },
       resolve: {
@@ -34,7 +34,7 @@ app.config(['$stateProvider', function($stateProvider) {
     });
 }]);
 
-app.controller('ballot.controller', ['$rootScope', '$scope', 'animateNumber', 'ballot', function ($rootScope, $scope, animateNumber, ballot) {
+app.controller('numbersController', ['$rootScope', '$scope', 'animateNumber', 'ballot', function ($rootScope, $scope, animateNumber, ballot) {
   $scope.ballot = ballot;
   ballot.$promise.then(function (ballot) {
     ballot.animations = ballot.animations || {};

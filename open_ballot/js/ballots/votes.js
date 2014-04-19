@@ -1,9 +1,9 @@
 var lazy = require('lazy.js');
-var controllers = angular.module('open_ballot.ballots');
+var app = angular.module('open_ballot.ballots');
 
-controllers.controller('ballotController', ['$scope', 'api', '$stateParams', 'ballot', function($scope, api, $stateParams, ballot) {
+app.controller('votesController', ['$scope', 'api', '$stateParams', 'ballot', function($scope, api, $stateParams, ballot) {
   ballot.$promise.then(function (ballot) {
-    $scope.ballot = ballot
+    $scope.ballot = ballot;
     $scope.ballot_config.series.push({
         type: 'pie',
         name: 'to come',

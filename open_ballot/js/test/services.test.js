@@ -3,7 +3,7 @@ describe('services', function() {
     var api, $httpBackend;
 
     beforeEach(function() {
-      module('openBallotServices');
+      module('open_ballot.services');
       inject(function(_api_, _$httpBackend_) {
         api = _api_;
         $httpBackend = _$httpBackend_;

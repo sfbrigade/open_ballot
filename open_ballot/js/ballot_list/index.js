@@ -1,7 +1,7 @@
 lazy = require('lazy.js');
-var controllers = angular.module('openBallotControllers');
+var app = angular.module('open_ballot.ballot_list', ['open_ballot.services']);
 
-controllers.controller('ballotsController', ['$scope', 'api', function($scope, api) {
+app.controller('ballotsController', ['$scope', 'api', function($scope, api) {
   $scope.ballots = api.ballots.query();
   $scope.ballots.$promise.then(function (ballots) {
     lazy(ballots)

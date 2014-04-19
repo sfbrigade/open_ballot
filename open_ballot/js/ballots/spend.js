@@ -1,7 +1,7 @@
 var lazy = require('lazy.js');
 var app = angular.module('open_ballot.ballots');
 
-app.controller('ballotContributionsController', ['$scope', '$q', 'api', 'animateNumber', 'ballot', '$stateParams', function($scope, $q, api, animateNumber, ballot, $stateParams) {
+app.controller('spendController', ['$scope', '$q', 'api', 'animateNumber', 'ballot', '$stateParams', function($scope, $q, api, animateNumber, ballot, $stateParams) {
   var committieeData, stanceData, colors, committees, color;
   colors = Highcharts.getOptions().colors;
 

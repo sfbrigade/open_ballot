@@ -1,20 +1,21 @@
-var app = angular.module('openBallotApp', [
+var app = angular.module('open_ballot', [
   'ui.router',
   'highcharts-ng',
 
-  'openBallotControllers',
-  'openBallotDirectives',
-  'openBallotServices',
-  'open_ballot.ballots'
+  'open_ballot.directives',
+  'open_ballot.services',
+  'open_ballot.ballot_list',
+  'open_ballot.ballots',
+  'open_ballot.contracts'
 ]);
 
 require('highcharts-ng');
-require('./controllers');
 require('./directives');
 require('./services');
 require('./filters');
-
-require('./ballots_view');
+require('./ballot_list');
+require('./ballots');
+require('./contracts');
 
 app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
@@ -25,9 +26,9 @@ app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $ur
       templateUrl: 'partials/contracts.tpl.html',
       controller: 'contractsController'
     })
-    .state('ballots', {
+    .state('ballot_list', {
       url: '/ballots',
-      templateUrl: 'partials/ballots.tpl.html',
+      templateUrl: 'partials/ballot_list/index.tpl.html',
       controller: 'ballotsController'
     });
 }]);
