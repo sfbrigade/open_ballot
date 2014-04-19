@@ -3708,7 +3708,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
 .navbar-static-top {
   z-index: 1000;
   border-width: 0 0 1px;
-  background:#ffffff url("images/header.png") no-repeat top;  
 }
 @media (min-width: 768px) {
   .navbar-static-top {

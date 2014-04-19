@@ -44,13 +44,7 @@
   line-height: .75em;
 }
 
-#ballot-view .grid .grid-cell:nth-child(100),
-#ballot-view .grid .grid-cell:nth-child(300) {
-  border-right: 3px solid #777;
-}
-
-#ballot-view .grid .grid-cell:nth-child(2), #ballot-view .grid .grid-cell:nth-child(3),
-#ballot-view .grid .grid-cell:nth-child(4) {
+#ballot-view .grid .grid-cell + .grid-cell {
    border-top: .05em dotted #777;
 }
 #ballot-view .grid-label {color:#666;font-size:70%;text-transform:uppercase;}
