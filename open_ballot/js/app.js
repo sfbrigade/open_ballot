@@ -19,8 +19,12 @@ require('./contracts');
 
 app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $urlRouterProvider) {
 
-  $urlRouterProvider.otherwise("/ballots");
+  $urlRouterProvider.otherwise("/");
   $stateProvider
+    .state('home', {
+      url: '/',
+      templateUrl: 'partials/index.tpl.html'
+    })
     .state('contracts', {
       url: '/contracts',
       templateUrl: 'partials/contracts.tpl.html',
