@@ -41,7 +41,7 @@ services.service('api', ['$resource', function($resource) {
   };
 
   return {
-    ballots: indexedDataResourceFactory('/api/v1/ballots/:ballot_id', {ballot_id: '@ballot_id'}),
+    ballots: $resource('/api/v1/ballots/:ballot_id', {ballot_id: '@ballot_id'}),
     ballot_history: simpleDataResourceFactory('/data/ballot_history'),
     contracts: simpleDataResourceFactory('/data/contracts'),
     committees: indexedDataResourceFactory('/api/v1/committees/:id', {id: '@id'}),

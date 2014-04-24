@@ -46,23 +46,51 @@ class BallotAjaxView(BaseView):
         Returns a list of all ballot resources.  Called with GET /api/v1/ballots
         '''
 
-        ballot_measure_jsons = {}
+        ballot_measure_jsons = []
 
         for ballot_measure in BallotMeasure.all():
             ballot_measure_json = {
                 'id': ballot_measure.id,
-                'name': ballot_measure.name,
                 'prop_id': ballot_measure.prop_id,
+                'name': ballot_measure.name,
+                'description': ballot_measure.description,
+                'num_yes': ballot_measure.num_yes,
+                'num_no': ballot_measure.num_no,
+                'passed': ballot_measure.passed,
                 'election': {
                     'date': ballot_measure.election.date.isoformat()
-                },
-                'resource':\
-                    api_urls.BallotUrl.get_resource_url(ballot_measure.id)
+                }
             }
 
-            ballot_measure_jsons.update(
-                {ballot_measure.id: ballot_measure_json}
+            if ballot_measure.ballot_type:
+                ballot_measure_json.update({'ballot_type': {
+                        'name': ballot_measure.ballot_type.name,
+                        'percent_required':\
+                            float(ballot_measure.ballot_type.percent_required)
+                        }
+                    }
                 )
+
+            committees = DBSession.query(Committee).join(
+                Stance, and_(
+                    Stance.ballot_measure_id==ballot_measure.id,
+                    Stance.committee_id==Committee.id)
+                ).join(
+                    Contract, and_(
+                        Contract.committee_id==Committee.id
+                    )
+                )
+
+            ballot_measure_json['committees'] = []
+            for committee in committees:
+                ballot_measure_json['committees'].append({
+                    'id': committee.id,
+                    'name': committee.name,
+                    'resource':\
+                        api_urls.CommitteeUrl.get_resource_url(committee.id)
+                })
+
+            ballot_measure_jsons.append(ballot_measure_json)
 
         return ballot_measure_jsons
 
@@ -185,7 +213,7 @@ class BallotAjaxView(BaseView):
                         stance.ballot_measure_id
                         ),
                 'stance': {
-                    'voted_yes': stance.voted_yes 
+                    'voted_yes': stance.voted_yes
                 }
                 })
 
