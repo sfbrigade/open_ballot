@@ -30,12 +30,6 @@ class BaseView(object):
         return {'one': 'one', 'project': 'open_ballot'}
 
 def app(request):
-    logger.info('Building app...')
-    if not os.path.exists(BUILD_DIR):
-        os.mkdir(BUILD_DIR)
-    subprocess.call(['browserify',
-                     'open_ballot/js/app.js',
-                     '-o', 'build/bundle.js'])
     return FileResponse('build/bundle.js', request=request)
 
 class BallotAjaxView(BaseView):

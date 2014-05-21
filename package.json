@@ -41,5 +41,6 @@
     "stylus": "~0.44.0",
     "gulp": "~3.6.2",
     "gulp-stylus": "~1.0.0",
+    "vinyl-source-stream": "~0.1.1"
   }
 }
